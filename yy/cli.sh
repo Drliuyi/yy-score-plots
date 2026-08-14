@@ -100,7 +100,16 @@ command_name="$1"
 shift
 DIR0="${DIR0:-/mnt/d}"
 PHEDIR="${PHEDIR:-${DIR0}/data/ukb/phe}"
-CHECKOUT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENTRY_PATH="${BASH_SOURCE[0]}"
+if [[ -L "${ENTRY_PATH}" ]]; then
+  LINK_TARGET="$(readlink "${ENTRY_PATH}")"
+  if [[ "${LINK_TARGET}" == /* ]]; then
+    ENTRY_PATH="${LINK_TARGET}"
+  else
+    ENTRY_PATH="$(dirname "${ENTRY_PATH}")/${LINK_TARGET}"
+  fi
+fi
+CHECKOUT_ROOT="$(cd -L "$(dirname "${ENTRY_PATH}")/.." && pwd -L)"
 SCRIPT_ROOT="${SCRIPT_ROOT:-${CHECKOUT_ROOT}}"
 ANALYSIS_ROOT="${ANALYSIS_ROOT:-${DIR0}/analysis}"
 YY_OUTDIR="${YY_OUTDIR:-${ANALYSIS_ROOT}/yy}"
