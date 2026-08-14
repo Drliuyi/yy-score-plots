@@ -1,0 +1,14 @@
+outcome_id	outcome_label	source_kind	source_id	build	url	provenance	status
+abdominal_aneurysm	Abdominal aneurysm	finngen_r9	I9_ABAORTANEUR	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_ABAORTANEUR.gz	Yu supplementary Table S26	FROZEN
+atrial_fibrillation	Atrial fibrillation	finngen_r9	I9_AF	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_AF.gz	Yu supplementary Table S26	FROZEN
+aortic_valve_stenosis	Aortic valve stenosis	finngen_r9	I9_CAVS_OPERATED	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_CAVS_OPERATED.gz	Yu supplementary Table S26	FROZEN
+cad	Coronary artery disease	finngen_r9	I9_IHD	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_IHD.gz	Yu supplementary Table S26	FROZEN
+cardiomyopathy	Cardiomyopathy	finngen_r9	I9_CARDMYO	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_CARDMYO.gz	Yu supplementary Table S26	FROZEN
+deep_vein_thrombosis	Deep vein thrombosis	finngen_r9	I9_PHLETHROMBDVTLOW	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_PHLETHROMBDVTLOW.gz	Yu supplementary Table S26	FROZEN
+heart_failure	Heart failure	finngen_r9	I9_HEARTFAIL	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_HEARTFAIL.gz	Local endpoint-matched FinnGen R9 inference; not listed in S26	PROVISIONAL_DOCUMENTED
+intracerebral_hemorrhage	Intracerebral hemorrhage	finngen_r9	I9_ICH	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_ICH.gz	Yu supplementary Table S26	FROZEN
+ischemic_stroke	Ischemic stroke	gwas_catalog	GCST006908	GRCh37	https://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/GCST006001-GCST007000/GCST006908/harmonised/29531354-GCST006908-HP_0002140.h.tsv.gz	Yu supplementary Table S26 source ID; official harmonised file	FROZEN
+peripheral_arterial_disease	Peripheral arterial disease	finngen_r9	I9_OTHPER	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_OTHPER.gz	Yu supplementary Table S26	FROZEN
+pulmonary_embolism	Pulmonary embolism	finngen_r9	I9_PULMEMB	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_PULMEMB.gz	Yu supplementary Table S26	FROZEN
+thoracic_aneurysm	Thoracic aneurysm	finngen_r9	I9_THAORTANEUR	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_THAORTANEUR.gz	Yu supplementary Table S26	FROZEN
+transient_ischemic_attack	Transient ischemic attack	finngen_r9	I9_TIA	GRCh38	https://storage.googleapis.com/finngen-public-data-r9/summary_stats/finngen_R9_I9_TIA.gz	Yu supplementary Table S26	FROZEN

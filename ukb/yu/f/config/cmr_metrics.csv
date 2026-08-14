@@ -1,0 +1,20 @@
+metric_id,Outcome,anatomy,source_column,source_field
+LVEDV,LVEDV (mL),LV,lv_end_diastolic_volume_f24100_2_0,p24100_i2
+LVESV,LVESV (mL),LV,lv_end_systolic_volume_f24101_2_0,p24101_i2
+LVSV,LVSV (mL),LV,lv_stroke_volume_f24102_2_0,p24102_i2
+LVEF,LVEF (%),LV,lv_ejection_fraction_f24103_2_0,p24103_i2
+LVCO,LVCO (L/min),LV,lv_cardiac_output_f24104_2_0,p24104_i2
+LVM,LVM (g),LV,lv_myocardial_mass_f24105_2_0,p24105_i2
+LV_WALL_THICKNESS,Global wall thickness for the LV mean myocardial (mm),LV,lv_mean_myocardial_wall_thickness_global_f24140_2_0,p24140_i2
+RVEDV,RVEDV (mL),RV,rv_end_diastolic_volume_f24106_2_0,p24106_i2
+RVESV,RVESV (mL),RV,rv_end_systolic_volume_f24107_2_0,p24107_i2
+RVSV,RVSV (mL),RV,rv_stroke_volume_f24108_2_0,p24108_i2
+RVEF,RVEF (%),RV,rv_ejection_fraction_f24109_2_0,p24109_i2
+LAVMAX,LAV max (mL),LA,la_maximum_volume_f24110_2_0,p24110_i2
+LAVMIN,LAV min (mL),LA,la_minimum_volume_f24111_2_0,p24111_i2
+LASV,LASV (mL),LA,la_stroke_volume_f24112_2_0,p24112_i2
+LAEF,LAEF (%),LA,la_ejection_fraction_f24113_2_0,p24113_i2
+RAVMAX,RAV max (mL),RA,ra_maximum_volume_f24114_2_0,p24114_i2
+RAVMIN,RAV min (mL),RA,ra_minimum_volume_f24115_2_0,p24115_i2
+RASV,RASV (mL),RA,ra_stroke_volume_f24116_2_0,p24116_i2
+RAEF,RAEF (%),RA,ra_ejection_fraction_f24117_2_0,p24117_i2

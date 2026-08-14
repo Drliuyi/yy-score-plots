@@ -1,0 +1,215 @@
+`%||%` <- function(x, y) if (is.null(x) || !length(x) || !nzchar(as.character(x[[1L]]))) y else x
+
+score_env <- function(name, default = "") {
+  value <- Sys.getenv(name, unset = "")
+  if (nzchar(value)) value else default
+}
+
+score_norm <- function(path, must_work = FALSE) {
+  value <- gsub("\\\\", "/", path.expand(as.character(path[[1L]])))
+  if (!grepl("^(/|[A-Za-z]:/)", value)) value <- file.path(getwd(), value)
+  value <- if (grepl("^[A-Za-z]:/$", value)) value else sub("/+$", "", value)
+  if (isTRUE(must_work) && !file.exists(value) && !dir.exists(value)) {
+    stop("Required path does not exist: ", value, call. = FALSE)
+  }
+  value
+}
+
+score_args <- function(args = commandArgs(trailingOnly = TRUE)) {
+  result <- list(stage = "help", fold = NA_integer_, workers = 1L)
+  for (arg in args) {
+    if (arg %in% c("--h", "-h", "--help")) {
+      result$stage <- "help"
+    } else if (grepl("^--[^=]+=", arg)) {
+      key <- gsub("-", "_", sub("^--([^=]+)=.*$", "\\1", arg))
+      value <- sub("^--[^=]+=", "", arg)
+      if (!key %in% c(
+        "stage", "fold", "workers", "dir0", "phe_dir", "script_root",
+        "analysis_root", "yy_outdir", "output_root", "common_root", "config",
+        "method", "source_root", "fold_root"
+      )) stop("Unknown argument: ", arg, call. = FALSE)
+      result[[key]] <- value
+    } else {
+      stop("Arguments must use --name=value: ", arg, call. = FALSE)
+    }
+  }
+  result$fold <- suppressWarnings(as.integer(result$fold))
+  result$workers <- suppressWarnings(as.integer(result$workers))
+  result
+}
+
+score_resolve <- function(project_dir, parsed, method = "") {
+  default_dir0 <- if (.Platform$OS.type == "windows") "D:/" else "/mnt/d"
+  dir0 <- parsed$dir0 %||% score_env("DIR0", default_dir0)
+  phe_dir <- parsed$phe_dir %||% score_env("PHEDIR", file.path(dir0, "data", "ukb", "phe"))
+  script_root <- parsed$script_root %||% score_env("SCRIPT_ROOT", file.path(dir0, "scripts"))
+  analysis_root <- parsed$analysis_root %||% score_env("ANALYSIS_ROOT", file.path(dir0, "analysis"))
+  yy_outdir <- parsed$yy_outdir %||% score_env("YY_OUTDIR", file.path(analysis_root, "yy"))
+  config <- parsed$config %||% file.path(project_dir, "config", "fair.json")
+  common_root <- parsed$common_root %||% score_env(
+    "YY_SCORE_COMMON_ROOT", file.path(yy_outdir, "score", "common-fair-inputs")
+  )
+  fold_root <- parsed$fold_root %||% score_env(
+    "YY_SCORE_FOLD_ROOT", file.path(yy_outdir, "reference", "cad_fivefold_v1")
+  )
+  output_root <- parsed$output_root %||% if (nzchar(method)) {
+    score_env("YY_SCORE_OUTPUT_ROOT", file.path(yy_outdir, "score", method))
+  } else common_root
+  list(
+    project_dir = score_norm(project_dir, TRUE),
+    dir0 = score_norm(dir0), phe_dir = score_norm(phe_dir),
+    script_root = score_norm(script_root), analysis_root = score_norm(analysis_root),
+    yy_outdir = score_norm(yy_outdir), config = score_norm(config, TRUE),
+    common_root = score_norm(common_root), output_root = score_norm(output_root),
+    fold_root = score_norm(fold_root),
+    all_rds = score_norm(file.path(phe_dir, "Rdata", "all.rds")),
+    prot_rds = score_norm(file.path(phe_dir, "Rdata", "prot.rds")),
+    fold_yin = score_norm(file.path(fold_root, "fold_assignment_yin.csv")),
+    fold_yang = score_norm(file.path(fold_root, "fold_assignment_yang.csv"))
+  )
+}
+
+score_print_roots <- function(paths) {
+  cat(
+    "Resolved Huang-lab roots:\n",
+    "  DIR0=", paths$dir0, "\n",
+    "  PHEDIR=", paths$phe_dir, "\n",
+    "  SCRIPT_ROOT=", paths$script_root, "\n",
+    "  ANALYSIS_ROOT=", paths$analysis_root, "\n",
+    "  YY_OUTDIR=", paths$yy_outdir, "\n",
+    "Resolved inputs/outputs:\n",
+    "  ALL_RDS=", paths$all_rds, "\n",
+    "  PROT_RDS=", paths$prot_rds, "\n",
+    "  FOLD_ROOT=", paths$fold_root, "\n",
+    "  COMMON_ROOT=", paths$common_root, "\n",
+    "  OUTPUT_ROOT=", paths$output_root, "\n",
+    sep = ""
+  )
+}
+
+score_require <- function(paths, label = "required input") {
+  missing <- paths[!file.exists(paths)]
+  if (length(missing)) stop(label, " missing: ", paste(missing, collapse = "; "), call. = FALSE)
+}
+
+score_as_date <- function(x) {
+  if (inherits(x, "Date")) return(x)
+  if (inherits(x, "POSIXt")) return(as.Date(x))
+  if (is.numeric(x)) return(as.Date(x, origin = "1970-01-01"))
+  suppressWarnings(as.Date(as.character(x)))
+}
+
+score_row_min_date <- function(...) {
+  value <- do.call(cbind, lapply(list(...), function(x) as.numeric(score_as_date(x))))
+  result <- apply(value, 1L, function(row) if (all(!is.finite(row))) NA_real_ else min(row, na.rm = TRUE))
+  as.Date(result, origin = "1970-01-01")
+}
+
+score_build_endpoint <- function(data, follow_end) {
+  required <- c("eid", "date_attend", "fod_icd10_cvd_cad", "date_lost", "date_death")
+  score_require_columns <- setdiff(required, names(data))
+  if (length(score_require_columns)) {
+    stop("all.rds is missing endpoint columns: ", paste(score_require_columns, collapse = ", "), call. = FALSE)
+  }
+  baseline <- score_as_date(data$date_attend)
+  event_date <- score_as_date(data$fod_icd10_cvd_cad)
+  censor <- score_row_min_date(data$date_lost, data$date_death, rep(as.Date(follow_end), nrow(data)))
+  censor[is.na(censor)] <- as.Date(follow_end)
+  prevalent <- !is.na(event_date) & !is.na(baseline) & event_date < baseline
+  incident <- !is.na(event_date) & !is.na(baseline) & event_date >= baseline & event_date <= censor
+  event_time <- as.numeric(event_date - baseline) / 365.25
+  follow_time <- as.numeric(censor - baseline) / 365.25
+  time <- ifelse(incident, event_time, follow_time)
+  time[!is.finite(time) | time <= 0] <- NA_real_
+  data.table::data.table(
+    eid = as.character(data$eid), time = time, event = as.integer(incident),
+    prevalent = as.integer(prevalent), b2e = event_time
+  )
+}
+
+score_known_horizon <- function(time, event, horizon = 5) {
+  known <- (event == 1L & time <= horizon) | time > horizon
+  list(known = known, label = as.integer(event == 1L & time <= horizon))
+}
+
+score_write_f32 <- function(matrix_value, path) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  temporary <- paste0(path, ".tmp.", Sys.getpid())
+  connection <- file(temporary, open = "wb")
+  on.exit({
+    try(close(connection), silent = TRUE)
+    if (file.exists(temporary)) unlink(temporary)
+  }, add = TRUE)
+  writeBin(as.numeric(matrix_value), connection, size = 4L, endian = "little")
+  close(connection)
+  expected <- as.double(nrow(matrix_value)) * as.double(ncol(matrix_value)) * 4
+  if (file.info(temporary)$size != expected) stop("Float32 write size failed: ", path, call. = FALSE)
+  if (!file.rename(temporary, path)) stop("Atomic float32 rename failed: ", path, call. = FALSE)
+  invisible(path)
+}
+
+score_read_f32 <- function(path, rows, columns) {
+  expected <- as.double(rows) * as.double(columns) * 4
+  if (!file.exists(path) || file.info(path)$size != expected) {
+    stop("Float32 matrix contract failed: ", path, call. = FALSE)
+  }
+  connection <- file(path, open = "rb")
+  on.exit(close(connection), add = TRUE)
+  value <- readBin(connection, what = "numeric", n = rows * columns, size = 4L, endian = "little")
+  if (length(value) != rows * columns) stop("Float32 read incomplete: ", path, call. = FALSE)
+  matrix(value, nrow = rows, ncol = columns)
+}
+
+score_atomic_csv <- function(data, path) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  temporary <- if (grepl("[.]gz$", path)) {
+    paste0(sub("[.]gz$", "", path), ".tmp.", Sys.getpid(), ".gz")
+  } else paste0(path, ".tmp.", Sys.getpid())
+  data.table::fwrite(data, temporary)
+  if (!file.rename(temporary, path)) stop("Atomic CSV rename failed: ", path, call. = FALSE)
+  invisible(path)
+}
+
+score_atomic_rds <- function(object, path) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  temporary <- paste0(path, ".tmp.", Sys.getpid())
+  saveRDS(object, temporary, compress = "xz")
+  if (!file.rename(temporary, path)) stop("Atomic RDS rename failed: ", path, call. = FALSE)
+  invisible(path)
+}
+
+score_atomic_text <- function(lines, path) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  temporary <- paste0(path, ".tmp.", Sys.getpid())
+  writeLines(as.character(lines), temporary, useBytes = TRUE)
+  if (!file.rename(temporary, path)) stop("Atomic text rename failed: ", path, call. = FALSE)
+  invisible(path)
+}
+
+score_inner_foldid <- function(label, folds, seed) {
+  set.seed(as.integer(seed))
+  result <- integer(length(label))
+  for (value in sort(unique(label))) {
+    index <- sample(which(label == value))
+    result[index] <- rep(seq_len(folds), length.out = length(index))
+  }
+  result
+}
+
+score_fit_preprocessor <- function(x) {
+  center <- apply(x, 2L, function(value) {
+    finite <- value[is.finite(value)]
+    if (length(finite)) stats::median(finite) else 0
+  })
+  for (j in seq_len(ncol(x))) x[!is.finite(x[, j]), j] <- center[[j]]
+  mean_value <- colMeans(x)
+  x <- sweep(x, 2L, mean_value, "-")
+  scale_value <- sqrt(colSums(x * x) / pmax(1, nrow(x) - 1L))
+  scale_value[!is.finite(scale_value) | scale_value < 1e-8] <- 1
+  list(x = sweep(x, 2L, scale_value, "/"), median = center, center = mean_value, scale = scale_value)
+}
+
+score_apply_preprocessor <- function(x, spec) {
+  for (j in seq_len(ncol(x))) x[!is.finite(x[, j]), j] <- spec$median[[j]]
+  sweep(sweep(x, 2L, spec$center, "-"), 2L, spec$scale, "/")
+}

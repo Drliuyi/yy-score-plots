@@ -1,0 +1,12 @@
+source_id,description,url,local_file,sha256,role
+paper,Systematic analyses uncover plasma proteins linked to incident cardiovascular diseases,https://academic.oup.com/proteincell/article/17/3/231/8250438,,NA,primary publication
+paper_pmc,PubMed Central full text and open-access package,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,,NA,primary full text
+supplement_tables,Official supplementary Tables S1-S26,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/pwaf072_supplementary_table_1.xlsx,e21e5699f2b9fb7f86d26fed90bbebe03688d46f4a035a1f6494cefc14b895d7,method and result reference
+supplement_methods,Official supplementary methods and Figures S1-S5,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/pwaf072_supplementary_figure_1.pdf,b78b07054109605b15b99a0501b7527448b073e9ce8330addf7d637aa655f29a,method and figure reference
+figure1,Official main Figure 1,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig1.jpg,fb6df1f261163bca6d2e0531e58c087513cea0d3ed001623b82bb83a5806d9f7,visual reference only
+figure2,Official main Figure 2,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig2.jpg,24a67943bb67517b3042c27cc141b81b709098ca80f126e9f9c4fd2a28cb16f1,visual reference only
+figure3,Official main Figure 3,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig3.jpg,a66b2288d396ce73a33e64e343c23cfdb3755dd0bc4c778efc6aa54e1dd8191f,visual reference only
+figure4,Official main Figure 4,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig4.jpg,cec6c00933255b41b040705fea93acaf612937f8cf6d4afce85b79548f72ef1f,visual reference only
+figure5,Official main Figure 5,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig5.jpg,48c7667c101bb9b0db9ad3002f9d8bbe03a1506eafa0dd54ca5acf0242b3c868,visual reference only
+figure6,Official main Figure 6,https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/,raw/article_figures/pwaf072_fig6.jpg,6abb51928bf3d272ebc5366feda739d7ded864b8179f23a321591f3b08820386,visual reference only
+score2,SCORE2 risk prediction algorithms,https://pmc.ncbi.nlm.nih.gov/articles/PMC8248998/,,NA,SCORE2 formula reference

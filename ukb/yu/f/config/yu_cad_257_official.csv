@@ -1,0 +1,258 @@
+protein,rank,published_importance,uniprot,panel,protein_definition,local_feature
+GDF15,1,0.0957527104795299,Q99988,Cardiometabolic,Growth/differentiation factor 15,gdf15
+CXCL17,2,0.0226553996321342,Q6UXB2,Inflammation,C-X-C motif chemokine 17,cxcl17
+MMP12,3,0.0220749696670551,P39900,Oncology,Macrophage metalloelastase,mmp12
+NTPROBNP,4,0.0187429765862963,NTproBNP,Cardiometabolic,N-terminal prohormone of brain natriuretic peptide,ntprobnp
+HAVCR1,5,0.0155017370353874,Q96D42,Oncology,Hepatitis A virus cellular receptor 1,havcr1
+ADGRG2,6,0.0135082684340473,Q8IZP9,Cardiometabolic,Adhesion G-protein coupled receptor G2,adgrg2
+PGF,7,0.0124062901457969,P49763,Inflammation,Placenta growth factor,pgf
+REN,8,0.011236015961152,P00797,Cardiometabolic,Renin,ren
+PRSS8,9,0.0106227048482431,Q16651,Inflammation,Prostasin,prss8
+CDCP1,10,0.0103454574773927,Q9H5V8,Neurology,CUB domain-containing protein 1,cdcp1
+ENPP2,11,0.0096520683738328,Q13822,Cardiometabolic,Ectonucleotide pyrophosphatase/phosphodiesterase family member 2,enpp2
+EDA2R,12,0.0095724523591335,Q9HAV5,Oncology,Tumor necrosis factor receptor superfamily member 27,eda2r
+MMP3,13,0.0091966267298213,P08254,Neurology,Stromelysin-1,mmp3
+ACE2,14,0.008788237429126,Q9BYF1,Cardiometabolic,Angiotensin-converting enzyme 2,ace2
+CDH3,15,0.0081525499529242,P22223,Neurology,Cadherin-3,cdh3
+B4GAT1,16,0.008145716460631,O43505,Neurology,"Beta-1,4-glucuronyltransferase 1",b4gat1
+CALCA,17,0.0081441427281092,P01258,Neurology,Calcitonin,calca
+LPA,18,0.0079326790942087,P08519,Inflammation II,Apolipoprotein(a),lpa
+ANGPTL1,19,0.0070532924271341,O95841,Cardiometabolic,Angiopoietin-related protein 1,angptl1
+PLAT,20,0.0064868831169467,P00750,Cardiometabolic,Tissue-type plasminogen activator,plat
+CD300LG,21,0.0061257550199388,Q6UXG3,Neurology,CMRF35-like molecule 9,cd300lg
+RAB6A,22,0.0058848227814956,P20340,Inflammation,Ras-related protein Rab-6A,rab6a
+CPM,23,0.0058635089969987,P14384,Neurology,Carboxypeptidase M,cpm
+PLTP,24,0.00585471547282,P55058,Cardiometabolic,Phospholipid transfer protein,pltp
+UMOD,25,0.0057924694586082,P07911,Cardiometabolic,Uromodulin,umod
+NPPB,26,0.0057412033053541,P16860,Cardiometabolic,Natriuretic peptides B,nppb
+PON3,27,0.0057360949062967,Q15166,Inflammation,Serum paraoxonase/lactonase 3,pon3
+CHAD,28,0.0055625771231674,O15335,Inflammation II,Chondroadherin,chad
+CRIP2,29,0.0055135229813869,P52943,Neurology,Cysteine-rich protein 2,crip2
+TNFRSF10B,30,0.0053345646287732,O14763,Neurology,Tumor necrosis factor receptor superfamily member 10B,tnfrsf10b
+CTHRC1,31,0.0053203501344218,Q96CG8,Cardiometabolic II,Collagen triple helix repeat-containing protein 1,cthrc1
+IGFBP3,32,0.0052800291147635,P17936,Cardiometabolic,Insulin-like growth factor-binding protein 3,igfbp3
+CNTN5,33,0.0051979092431395,O94779,Neurology,Contactin-5,cntn5
+LRRN1,34,0.005152156138594,Q6UXK5,Inflammation,Leucine-rich repeat neuronal protein 1,lrrn1
+CDH2,35,0.0051479589158879,P19022,Cardiometabolic,Cadherin-2,cdh2
+ITGA11,36,0.0051084283211013,Q9UKX5,Inflammation,Integrin alpha-11,itga11
+GGT1,37,0.0047924783923031,P19440,Neurology,Glutathione hydrolase 1 proenzyme,ggt1
+CNTN3,38,0.0047070990723666,Q9P232,Neurology,Contactin-3,cntn3
+CEACAM5,39,0.0046897200115693,P06731,Oncology,Carcinoembryonic antigen-related cell adhesion molecule 5,ceacam5
+CTSV,40,0.0046790195698319,O60911,Oncology,Cathepsin L2,ctsv
+WFDC2,41,0.0046367971487812,Q14508,Oncology,WAP four-disulfide core domain protein 2,wfdc2
+SLITRK1,42,0.0045641311335206,Q96PX8,Inflammation II,SLIT and NTRK-like protein 1,slitrk1
+NPL,43,0.0045133333779696,Q9BXD5,Cardiometabolic II,N-acetylneuraminate lyase,npl
+PTGDS,44,0.0045103553506149,P41222,Cardiometabolic,Prostaglandin-H2 D-isomerase,ptgds
+ELN,45,0.0045085512940583,P15502,Cardiometabolic II,Elastin,eln
+NELL2,46,0.0043969398913246,Q99435,Inflammation,Protein kinase C-binding protein NELL2,nell2
+BRK1,47,0.0043695619276017,Q8WUW1,Neurology,Protein BRICK1,brk1
+SPINK6,48,0.0043188001140526,Q6UWN8,Oncology,Serine protease inhibitor Kazal-type 6,spink6
+CHCHD10,49,0.0042081040697131,Q8WYQ3,Neurology II,"Coiled-coil-helix-coiled-coil-helix domain-containing protein 10, mitochondrial",chchd10
+ADGRG1,50,0.0041499209229821,Q9Y653,Oncology,Adhesion G-protein coupled receptor G1,adgrg1
+SLAMF8,51,0.0040660258275504,Q9P0V8,Oncology,SLAM family member 8,slamf8
+LRTM2,52,0.0040645046770595,Q8N967,Neurology II,Leucine-rich repeat and transmembrane domain-containing protein 2,lrtm2
+GAS6,53,0.0040564701245099,Q14393,Cardiometabolic,Growth arrest-specific protein 6,gas6
+CCL11,54,0.0040543782484148,P51671,Inflammation,Eotaxin,ccl11
+C1QA,55,0.0040255714734996,P02745,Inflammation,Complement C1q subcomponent subunit A,c1qa
+IGDCC4,56,0.0038867046976701,Q8TDY8,Cardiometabolic II,Immunoglobulin superfamily DCC subclass member 4,igdcc4
+BCAN,57,0.0038256439099799,Q96GW7,Neurology,Brevican core protein,bcan
+RCOR1,58,0.0038161627509715,Q9UKL0,Cardiometabolic,REST corepressor 1,rcor1
+TNNI3,59,0.0038110390419927,P19429,Cardiometabolic,"Troponin I, cardiac muscle",tnni3
+FURIN,60,0.0037707385253809,P09958,Oncology,Furin,furin
+CLEC4D,61,0.0037406462619306,Q8WXI8,Inflammation,C-type lectin domain family 4 member D,clec4d
+PRL,62,0.00372566412487,P01236,Neurology,Prolactin,prl
+VSTM1,63,0.0037084946857657,Q6UX27,Neurology,V-set and transmembrane domain-containing protein 1,vstm1
+VCAN,64,0.0036816645697934,P13611,Neurology,Versican core protein,vcan
+HYAL1,65,0.003679183778405,Q12794,Cardiometabolic,Hyaluronidase-1,hyal1
+LTBP2,66,0.0036777323816132,Q14767,Cardiometabolic,Latent-transforming growth factor beta-binding protein 2,ltbp2
+WFIKKN1,67,0.0036343111719678,Q96NZ8,Neurology,"WAP, Kazal, immunoglobulin, Kunitz and NTR domain-containing protein 1",wfikkn1
+THBS2,68,0.0036141035042624,P35442,Neurology,Thrombospondin-2,thbs2
+KLK4,69,0.0035964096419909,Q9Y5K2,Oncology,Kallikrein-4,klk4
+ADAMTS15,70,0.0035525010245677,Q8TE58,Oncology,A disintegrin and metalloproteinase with thrombospondin motifs 15,adamts15
+DRAXIN,71,0.0035344686238061,Q8NBI3,Neurology,Draxin,draxin
+LGALS4,72,0.0035275942890272,P56470,Inflammation,Galectin-4,lgals4
+HEG1,73,0.0035093147266029,Q9ULI3,Inflammation II,Protein HEG homolog 1,heg1
+ACTA2,74,0.003481916728582,P62736,Cardiometabolic,"Actin, aortic smooth muscle",acta2
+FGA,75,0.0034377172731759,P02671,Inflammation II,Fibrinogen alpha chain,fga
+CCL21,76,0.003401954150038,O00585,Inflammation,C-C motif chemokine 21,ccl21
+CA12,77,0.0034014639689869,O43570,Oncology,Carbonic anhydrase 12,ca12
+NEFL,78,0.0033879896701565,P07196,Neurology,Neurofilament light polypeptide,nefl
+PDCD1,79,0.0033728688807827,Q15116,Oncology,Programmed cell death protein 1,pdcd1
+EPO,80,0.0033259215136961,P01588,Inflammation,Erythropoietin,epo
+PREB,81,0.0033226637186536,Q9HCU5,Inflammation,Prolactin regulatory element-binding protein,preb
+ENPP5,82,0.0032742676516346,Q9UJA9,Inflammation,Ectonucleotide pyrophosphatase/phosphodiesterase family member 5,enpp5
+IMMT,83,0.0032702685984402,Q16891,Oncology II,MICOS complex subunit MIC60,immt
+TFRC,84,0.0032586421661278,P02786,Cardiometabolic,Transferrin receptor protein 1,tfrc
+CBLN4,85,0.0032428938406154,Q9NTU7,Oncology,Cerebellin-4,cbln4
+FOLR1,86,0.0032351352999101,P15328,Oncology,Folate receptor alpha,folr1
+ADM,87,0.0032341827579142,P35318,Oncology,Pro-adrenomedullin,adm
+CD93,88,0.0032277193037324,Q9NPY3,Cardiometabolic,Complement component C1q receptor,cd93
+MYBPC1,89,0.0031982905189631,Q00872,Cardiometabolic II,"Myosin-binding protein C, slow-type",mybpc1
+EPS8L2,90,0.0031923989221974,Q9H6S3,Oncology,Epidermal growth factor receptor kinase substrate 8-like protein 2,eps8l2
+BAIAP2,91,0.0031591478688286,Q9UQB8,Oncology,Brain-specific angiogenesis inhibitor 1-associated protein 2,baiap2
+DCBLD2,92,0.0031513392112833,Q96PD2,Oncology,"Discoidin, CUB and LCCL domain-containing protein 2",dcbld2
+ANXA10,93,0.0031376338833761,Q9UJ72,Neurology,Annexin A10,anxa10
+FGF5,94,0.0031345748425091,P12034,Inflammation,Fibroblast growth factor 5,fgf5
+ACP5,95,0.0031258962257741,P13686,Cardiometabolic,Tartrate-resistant acid phosphatase type 5,acp5
+HPGDS,96,0.0031157472654864,O60760,Oncology,Hematopoietic prostaglandin D synthase,hpgds
+DKK3,97,0.0031103068015972,Q9UBP4,Cardiometabolic,Dickkopf-related protein 3,dkk3
+RBFOX3,98,0.003110234686902,A6NFN3,Neurology II,RNA binding protein fox-1 homolog 3,rbfox3
+TNFRSF11A,99,0.0031093312065571,Q9Y6Q6,Inflammation,Tumor necrosis factor receptor superfamily member 11A,tnfrsf11a
+CHGA,100,0.0030834391891543,P10645,Cardiometabolic II,Chromogranin-A,chga
+FGFBP1,101,0.0030445544379483,Q14512,Oncology,Fibroblast growth factor-binding protein 1,fgfbp1
+LCN2,102,0.0030257813684059,P80188,Cardiometabolic,Neutrophil gelatinase-associated lipocalin,lcn2
+CD1C,103,0.0030148190561486,P29017,Oncology,T-cell surface glycoprotein CD1c,cd1c
+CEACAM6,104,0.0029892956381583,P40199,Cardiometabolic II,Carcinoembryonic antigen-related cell adhesion molecule 6,ceacam6
+LGALS7_LGALS7B,105,0.002981657177125,P47929,Oncology,Galectin-7,lgals7_lgals7b
+SLC39A14,106,0.0029625147587772,Q15043,Neurology,Zinc transporter ZIP14,slc39a14
+VSIG4,107,0.0029549402785768,Q9Y279,Neurology,V-set and immunoglobulin domain-containing protein 4,vsig4
+CRHBP,108,0.0029522819295195,P24387,Inflammation,Corticotropin-releasing factor-binding protein,crhbp
+SUSD2,109,0.00293647608448,Q9UGT4,Neurology,Sushi domain-containing protein 2,susd2
+LTBP3,110,0.0029269044008803,Q9NS15,Oncology,Latent-transforming growth factor beta-binding protein 3,ltbp3
+TACSTD2,111,0.0029142873359759,P09758,Oncology,Tumor-associated calcium signal transducer 2,tacstd2
+EGFR,112,0.0028827959914644,P00533,Cardiometabolic,Epidermal growth factor receptor,egfr
+ALDH3A1,113,0.0028801903752145,P30838,Inflammation,"Aldehyde dehydrogenase, dimeric NADP-preferring",aldh3a1
+SFRP1,114,0.0028666871010382,Q8N474,Neurology,Secreted frizzled-related protein 1,sfrp1
+MSR1,115,0.0028623437179048,P21757,Neurology,Macrophage scavenger receptor types I and II,msr1
+VMO1,116,0.0028539697292599,Q7Z5L0,Oncology,Vitelline membrane outer layer protein 1 homolog,vmo1
+IL18R1,117,0.0028459304475725,Q13478,Inflammation,Interleukin-18 receptor 1,il18r1
+C1QTNF1,118,0.0028436074791215,Q9BXJ1,Cardiometabolic,Complement C1q tumor necrosis factor-related protein 1,c1qtnf1
+SORCS2,119,0.0028422993873796,Q96PQ0,Oncology,VPS10 domain-containing receptor SorCS2,sorcs2
+TNFSF13B,120,0.0028383890576938,Q9Y275,Cardiometabolic,Tumor necrosis factor ligand superfamily member 13B,tnfsf13b
+RET,121,0.0028108977042489,P07949,Oncology,Proto-oncogene tyrosine-protein kinase receptor Ret,ret
+LILRA5,122,0.0027965574204727,A6NI73,Cardiometabolic,Leukocyte immunoglobulin-like receptor subfamily A member 5,lilra5
+MEP1B,123,0.0027917502262079,Q16820,Cardiometabolic,Meprin A subunit beta,mep1b
+CD99,124,0.0027803659619805,P14209,Neurology,CD99 antigen,cd99
+CRIM1,125,0.0027680685811221,Q9NZV1,Inflammation,Cysteine-rich motor neuron 1 protein,crim1
+IL1RL2,126,0.0027664793152902,Q9HB29,Inflammation,Interleukin-1 receptor-like 2,il1rl2
+KRT18,127,0.0027656951098685,P05783,Oncology,"Keratin, type I cytoskeletal 18",krt18
+THBD,128,0.0027468991087576,P07204,Cardiometabolic,Thrombomodulin,thbd
+MMP7,129,0.0027388712453274,P09237,Cardiometabolic,Matrilysin,mmp7
+SUSD5,130,0.0027354638267854,O60279,Inflammation II,Sushi domain-containing protein 5,susd5
+CD207,131,0.0027151060216314,Q9UJ71,Oncology,C-type lectin domain family 4 member K,cd207
+CTSL,132,0.0027096368587082,P07711,Cardiometabolic,Cathepsin L1,ctsl
+DEFA1_DEFA1B,133,0.0027076190969206,P59665,Cardiometabolic,Neutrophil defensin 1,defa1_defa1b
+MUC13,134,0.0026916103884146,Q9H3R2,Neurology,Mucin-13,muc13
+GGH,135,0.002665991885902,Q92820,Cardiometabolic,Gamma-glutamyl hydrolase,ggh
+CCL7,136,0.0026449602382606,P80098,Inflammation,C-C motif chemokine 7,ccl7
+PTN,137,0.002643084068962,P21246,Cardiometabolic,Pleiotrophin,ptn
+SMPD1,138,0.0026336494324779,P17405,Neurology,Sphingomyelin phosphodiesterase,smpd1
+LIFR,139,0.002632674077701,P42702,Inflammation,Leukemia inhibitory factor receptor,lifr
+CFI,140,0.0026323327067919,P05156,Inflammation II,Complement factor I,cfi
+FGFR2,141,0.0026196911919011,P21802,Oncology,Fibroblast growth factor receptor 2,fgfr2
+INHBC,142,0.0026190362973847,P55103,Neurology,Inhibin beta C chain,inhbc
+FAM3B,143,0.002604088412268,P58499,Oncology,Protein FAM3B,fam3b
+TPP1,144,0.0026004163471895,O14773,Inflammation,Tripeptidyl-peptidase 1,tpp1
+TREM2,145,0.002593676733802,Q9NZC2,Inflammation,Triggering receptor expressed on myeloid cells 2,trem2
+KRT19,146,0.0025893318516516,P08727,Inflammation,"Keratin, type I cytoskeletal 19",krt19
+LRP11,147,0.0025801438813753,Q86VZ4,Cardiometabolic,Low-density lipoprotein receptor-related protein 11,lrp11
+NID1,148,0.0025706765593861,P14543,Cardiometabolic,Nidogen-1,nid1
+CRELD1,149,0.0025538206428982,Q96HD1,Inflammation II,Protein disulfide isomerase CRELD1,creld1
+NPPC,150,0.0025528666082234,P23582,Inflammation,C-type natriuretic peptide,nppc
+IL19,151,0.002542883421337,Q9UHD0,Cardiometabolic,Interleukin-19,il19
+CLEC5A,152,0.0025277270430014,Q9NY25,Cardiometabolic,C-type lectin domain family 5 member A,clec5a
+ZBTB17,153,0.0025195522542584,Q13105,Cardiometabolic,Zinc finger and BTB domain-containing protein 17,zbtb17
+SFTPA2,154,0.002510700608448,Q8IWL1,Oncology,Pulmonary surfactant-associated protein A2,sftpa2
+DPP4,155,0.0025087557397232,P27487,Cardiometabolic,Dipeptidyl peptidase 4,dpp4
+ADAM8,156,0.0025071035770172,P78325,Neurology,Disintegrin and metalloproteinase domain-containing protein 8,adam8
+GCG,157,0.0025028859904074,P01275,Oncology,Pro-glucagon,gcg
+IL1RL1,158,0.002501640601005,Q01638,Cardiometabolic,Interleukin-1 receptor-like 1,il1rl1
+SLAMF7,159,0.0024888697372575,Q9NQ25,Inflammation,SLAM family member 7,slamf7
+CD300A,160,0.0024807125313927,Q9UGN4,Inflammation II,CMRF35-like molecule 8,cd300a
+CDH1,161,0.0024765055966783,P12830,Cardiometabolic,Cadherin-1,cdh1
+FOLR2,162,0.0024702693183276,P14207,Neurology,Folate receptor beta,folr2
+FAM3D,163,0.0024688466834298,Q96BQ1,Oncology II,Protein FAM3D,fam3d
+LCAT,164,0.0024463272675656,P04180,Inflammation II,Phosphatidylcholine-sterol acyltransferase,lcat
+PTPRN2,165,0.002429128004935,Q92932,Neurology,Receptor-type tyrosine-protein phosphatase N2,ptprn2
+TNFRSF17,166,0.0024273655554126,Q02223,Inflammation II,Tumor necrosis factor receptor superfamily member 17,tnfrsf17
+CD276,167,0.0024269664355329,Q5ZPR3,Inflammation,CD276 antigen,cd276
+PCSK9,168,0.0024234707038393,Q8NBP7,Cardiometabolic,Proprotein convertase subtilisin/kexin type 9,pcsk9
+XCL1,169,0.0023945680490005,P47992,Oncology,Lymphotactin,xcl1
+CD163,170,0.0023706130771541,Q86VB7,Cardiometabolic,Scavenger receptor cysteine-rich type 1 protein M130,cd163
+SERPINA3,171,0.0023684903423744,P01011,Inflammation II,Alpha-1-antichymotrypsin,serpina3
+IGFBP4,172,0.0023680116242346,P22692,Neurology,Insulin-like growth factor-binding protein 4,igfbp4
+CLSTN2,173,0.0023653579130452,Q9H4D0,Inflammation,Calsyntenin-2,clstn2
+TNFRSF12A,174,0.0023646420769451,Q9NP84,Oncology,Tumor necrosis factor receptor superfamily member 12A,tnfrsf12a
+CD4,175,0.0023528761235048,P01730,Inflammation,T-cell surface glycoprotein CD4,cd4
+EPHB6,176,0.0023470578315131,O15197,Neurology,Ephrin type-B receptor 6,ephb6
+MYOM3,177,0.0023243043778684,Q5VTT5,Inflammation II,Myomesin-3,myom3
+AREG,178,0.0023127501967087,P15514,Oncology,Amphiregulin,areg
+IL22,179,0.0023103405624337,Q9GZX6,Oncology II,Interleukin-22,il22
+MPO,180,0.0023014806628882,P05164,Neurology,Myeloperoxidase,mpo
+RBP2,181,0.0023011525649294,P50120,Oncology,Retinol-binding protein 2,rbp2
+C2,182,0.0022982743173918,P06681,Cardiometabolic,Complement C2,c2
+FSTL3,183,0.002274100236302,O95633,Inflammation,Follistatin-related protein 3,fstl3
+HSPB6,184,0.0022650781831687,O14558,Oncology,Heat shock protein beta-6,hspb6
+SCARF2,185,0.0022606642643051,Q96GP6,Neurology,Scavenger receptor class F member 2,scarf2
+CEACAM16,186,0.0022280408386532,Q2WEN9,Oncology II,Carcinoembryonic antigen-related cell adhesion molecule 16,ceacam16
+PLXNB2,187,0.0022114631634061,O15031,Cardiometabolic,Plexin-B2,plxnb2
+PIGR,188,0.0022018905571764,P01833,Neurology,Polymeric immunoglobulin receptor,pigr
+RNASE1,189,0.0021992313121034,P07998,Inflammation II,Ribonuclease pancreatic,rnase1
+PLA2G2A,190,0.0021823819336825,P14555,Cardiometabolic,"Phospholipase A2, membrane associated",pla2g2a
+YAP1,191,0.0021796219383948,P46937,Neurology II,Transcriptional coactivator YAP1,yap1
+FABP4,192,0.0021654868325974,P15090,Cardiometabolic,"Fatty acid-binding protein, adipocyte",fabp4
+MMP8,193,0.002138941202379,P22894,Neurology,Neutrophil collagenase,mmp8
+NCAN,194,0.0021269170098759,O14594,Neurology,Neurocan core protein,ncan
+OSCAR,195,0.0021237995354697,Q8IYS5,Inflammation,Osteoclast-associated immunoglobulin-like receptor,oscar
+PRTN3,196,0.0021089821269088,P24158,Cardiometabolic,Myeloblastin,prtn3
+GFRA1,197,0.0021044794904818,P56159,Oncology,GDNF family receptor alpha-1,gfra1
+IL15,198,0.0021027132189042,P40933,Inflammation,Interleukin-15,il15
+MME,199,0.0020897203191541,P08473,Oncology,Neprilysin,mme
+ICAM2,200,0.0020881709928267,P13598,Cardiometabolic,Intercellular adhesion molecule 2,icam2
+C7,201,0.0020865085314467,P10643,Inflammation II,Complement component C7,c7
+VWF,202,0.0020779953361941,P04275,Cardiometabolic,von Willebrand factor,vwf
+CCL22,203,0.002075998193644,O00626,Inflammation,C-C motif chemokine 22,ccl22
+FGL1,204,0.0020733873723615,Q08830,Inflammation II,Fibrinogen-like protein 1,fgl1
+GHR,205,0.0020658039098976,P10912,Inflammation II,Growth hormone receptor,ghr
+GAST,206,0.0020520994275756,P01350,Neurology II,Gastrin,gast
+CTSS,207,0.0020464056338111,P25774,Neurology,Cathepsin S,ctss
+CLGN,208,0.0020423057880666,O14967,Neurology II,Calmegin,clgn
+MILR1,209,0.0020386630896883,Q7Z6M3,Inflammation,Allergin-1,milr1
+CNTN1,210,0.0020314553298941,Q12860,Cardiometabolic,Contactin-1,cntn1
+SSC4D,211,0.0020278117581141,Q8WTU2,Cardiometabolic,Scavenger receptor cysteine-rich domain-containing group B protein,ssc4d
+FABP6,212,0.0020156881342211,P51161,Cardiometabolic,Gastrotropin,fabp6
+TFF1,213,0.0019974761354982,P04155,Neurology,Trefoil factor 1,tff1
+FBLN2,214,0.0019764602481341,P98095,Cardiometabolic II,Fibulin-2,fbln2
+TNFRSF6B,215,0.0019713839867811,O95407,Neurology,Tumor necrosis factor receptor superfamily member 6B,tnfrsf6b
+ITGA5,216,0.001970538162641,P08648,Neurology,Integrin alpha-5,itga5
+SCGB3A1,217,0.0019683786325593,Q96QR1,Inflammation II,Secretoglobin family 3A member 1,scgb3a1
+GALNT10,218,0.0019458898522733,Q86SR1,Oncology,Polypeptide N-acetylgalactosaminyltransferase 10,galnt10
+IL6,219,0.0019445087449816,P05231,Oncology,Interleukin-6,il6
+CD99L2,220,0.001930501363199,Q8TCZ2,Neurology,CD99 antigen-like protein 2,cd99l2
+SPON2,221,0.0019259595926604,Q9BUD6,Cardiometabolic,Spondin-2,spon2
+LGALS9,222,0.0019153307757708,O00182,Inflammation,Galectin-9,lgals9
+CST3,223,0.0019065114444272,P01034,Cardiometabolic,Cystatin-C,cst3
+LBP,224,0.0018964820689915,P18428,Cardiometabolic,Lipopolysaccharide-binding protein,lbp
+SFTPD,225,0.0018959792004673,P35247,Cardiometabolic,Pulmonary surfactant-associated protein D,sftpd
+RELT,226,0.0018925446784659,Q969Z4,Neurology,Tumor necrosis factor receptor superfamily member 19L,relt
+SDC1,227,0.0018914915036657,P18827,Cardiometabolic,Syndecan-1,sdc1
+EDN1,228,0.0018777541757846,P05305,Cardiometabolic II,Endothelin-1,edn1
+MIA,229,0.0018757040399026,Q16674,Oncology,Melanoma-derived growth regulatory protein,mia
+WNT9A,230,0.0018680240258198,O14904,Inflammation,Protein Wnt-9a,wnt9a
+NOS1,231,0.0018628687581387,P29475,Neurology,"Nitric oxide synthase, brain",nos1
+SCRG1,232,0.0018456927295562,O75711,Cardiometabolic II,Scrapie-responsive protein 1,scrg1
+CD59,233,0.0018327571309886,P13987,Cardiometabolic,CD59 glycoprotein,cd59
+EFNA4,234,0.001828771293873,P52798,Neurology,Ephrin-A4,efna4
+STC1,235,0.0018260422533018,P52823,Neurology,Stanniocalcin-1,stc1
+TNF,236,0.0018211706781369,P01375,Cardiometabolic,Tumor necrosis factor,tnf
+F9,237,0.001818847816816,P00740,Cardiometabolic,Coagulation factor IX,f9
+SIGLEC1,238,0.0017918322318227,Q9BZZ2,Inflammation,Sialoadhesin,siglec1
+CD27,239,0.0017869090076075,P26842,Oncology,CD27 antigen,cd27
+ICAM1,240,0.0017653419536205,P05362,Cardiometabolic,Intercellular adhesion molecule 1,icam1
+COL5A1,241,0.0017175506621007,P20908,Inflammation II,Collagen alpha-1(V) chain,col5a1
+MFAP4,242,0.0016955290568352,P55083,Inflammation II,Microfibril-associated glycoprotein 4,mfap4
+NPDC1,243,0.0016345399525028,Q9NQX5,Cardiometabolic,Neural proliferation differentiation and control protein 1,npdc1
+CCL16,244,0.0016202628158712,O15467,Cardiometabolic,C-C motif chemokine 16,ccl16
+CD302,245,0.0016113382204981,Q8IX05,Oncology,CD302 antigen,cd302
+TNFRSF19,246,0.0015451326242503,Q9NS68,Oncology,Tumor necrosis factor receptor superfamily member 19,tnfrsf19
+CTSO,247,0.0015240764775006,P43234,Inflammation,Cathepsin O,ctso
+VCAM1,248,0.0015103217384472,P19320,Cardiometabolic,Vascular cell adhesion protein 1,vcam1
+CA6,249,0.0014911327242419,P23280,Neurology,Carbonic anhydrase 6,ca6
+NCR1,250,0.0014717741327802,O76036,Inflammation,Natural cytotoxicity triggering receptor 1,ncr1
+SERPIND1,251,0.0014686633624868,P05546,Inflammation II,Heparin cofactor 2,serpind1
+ACVRL1,252,0.0014641803847976,P37023,Neurology,Serine/threonine-protein kinase receptor R3,acvrl1
+DPT,253,0.001456278097007,Q07507,Cardiometabolic,Dermatopontin,dpt
+CD80,254,0.0014443659511553,P33681,Cardiometabolic II,T-lymphocyte activation antigen CD80,cd80
+LGALS1,255,0.0014416169677956,P09382,Cardiometabolic,Galectin-1,lgals1
+LTBR,256,0.0014009938110404,P36941,Inflammation,Tumor necrosis factor receptor superfamily member 3,ltbr
+PIK3IP1,257,0.0011691345649232,Q96FE7,Neurology,Phosphoinositide-3-kinase-interacting protein 1,pik3ip1

@@ -1,0 +1,13 @@
+.DS_Store
+._*
+.deploy/
+**/__pycache__/
+*.pyc
+*.rds
+*.rda
+*.RData
+*.f32
+*.pt
+*.pkl
+*.joblib
+*.log

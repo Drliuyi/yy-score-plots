@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "locked_date": "2026-08-14",
+  "seed": 20260814,
+  "follow_end": "2024-01-01",
+  "horizon_years": 5.0,
+  "expected": {
+    "yin_n": 37127,
+    "yin_events": 3442,
+    "yang_n": 1766,
+    "protein_n": 2910,
+    "outer_folds": 5
+  },
+  "restricted_reference": {
+    "default_relative_to_yy_outdir": "reference/cad_fivefold_v1",
+    "yin_file": "fold_assignment_yin.csv",
+    "yang_file": "fold_assignment_yang.csv",
+    "yin_md5": "befca4f9c0c1c2b90afd00e1c30a812e",
+    "yang_md5": "14f882efef58ec6754b586c0f4307ce1",
+    "yin_sha256": "3c325decc66fb6ae9a3a24190ff55b3481bf23e38add6ef9913e589f436f380d",
+    "yang_sha256": "bf65dc6d34043c67471dab29d8a866fb6be6ec2a94d5b8b5627f5be0bcb3fdbc"
+  },
+  "pradeep_fair": {
+    "family": "binomial",
+    "alpha": 1.0,
+    "inner_folds": 10,
+    "type_measure": "auc",
+    "lambda_rule": "lambda.1se"
+  },
+  "yu_fair": {
+    "objective": "binary",
+    "n_estimators": 500,
+    "max_depth": 15,
+    "num_leaves": 10,
+    "subsample": 0.70,
+    "subsample_freq": 1,
+    "learning_rate": 0.01,
+    "colsample_bytree": 0.70,
+    "max_bin": 63,
+    "device_type": "gpu"
+  }
+}

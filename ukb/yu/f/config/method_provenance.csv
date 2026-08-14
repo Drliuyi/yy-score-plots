@@ -1,0 +1,26 @@
+parameter,value,provenance,status,note
+protein_missingness_max,0.30,supplementary_methods,FROZEN,Exclude proteins with missingness above 30 percent
+cox_protein_scale,within_scope_zscore,reporting_inference,REVIEW,The paper reports HRs in a proteomic association framework but does not explicitly state the NPX scaling unit; local output stores mean and SD
+train_fraction,0.6666666667,supplementary_methods,FROZEN,Two-thirds derivation and one-third hold-out
+split_seed,20260715,local_adaptation,FROZEN,Paper did not report a seed
+followup_cutoff,2023-09-30,local_data_freeze,REVIEW,The article defines censoring conceptually but does not report an exact common administrative cutoff
+candidate_bonferroni,0.05/P_QC,supplementary_methods,FROZEN,Applied within derivation for formal selection
+importance_cumulative_fraction,0.30,supplementary_methods,FROZEN,Endpoint-specific normalized gain prefix
+prediction_panel,local_derivation_reselected,supplementary_methods,FROZEN,Primary analysis repeats derivation-only Bonferroni candidate generation and endpoint-specific 30-percent cumulative-gain selection; published S12 257 is reference only
+score2_total_cholesterol,bb_TC_mmol_L,local_source_audit,FROZEN,The legacy total_cholesterol column mixes incompatible units and is rejected by range QC
+score2_hdl,bb_HDL_mmol_L,local_source_audit,FROZEN,Direct baseline biochemistry source with training-only imputation
+n_estimators,500,supplementary_methods,FROZEN,LightGBM 3.3.2
+python_version,3.9,supplementary_methods,FROZEN,Formal prediction environment must use Python 3.9
+max_depth,15,supplementary_methods,FROZEN,LightGBM
+num_leaves,10,supplementary_methods,FROZEN,LightGBM
+subsample,0.70,supplementary_methods,FROZEN,subsample_freq not reported and is set to 1 locally
+learning_rate,0.01,supplementary_methods,FROZEN,LightGBM
+colsample_bytree,0.70,supplementary_methods,FROZEN,LightGBM
+inner_folds,10,supplementary_methods,FROZEN,Derivation diagnostics and tuning
+bootstrap_n,1000,supplementary_methods,FROZEN,Participant-level hold-out resampling
+classification_threshold,OOF_Youden,local_adaptation,REVIEW,Paper did not report threshold used for classification metrics
+score2_recalibration,isotonic_training_only,supplementary_methods_plus_local_safeguard,FROZEN,Test outcomes never used
+bootstrap_interval,both_IQR_and_95CI,publication_inconsistency,FROZEN,Figure caption says IQR and methods say 95 percent CI
+lightgbm_tuning_space,not_reported,article_and_supplement,REVIEW,Reported final hyperparameters are frozen; unpublished search space cannot be reconstructed
+lightgbm_parallelism,three_models_each_five_threads,computational_adaptation,FROZEN,Changes scheduling only and preserves fixed seeds and model inputs
+cox_parallelism,four_endpoint_processes,computational_adaptation,FROZEN,Each endpoint is independent and merged only after feature-hash validation

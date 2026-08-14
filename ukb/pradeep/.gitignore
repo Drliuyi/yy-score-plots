@@ -1,0 +1,17 @@
+.DS_Store
+._*
+**/__pycache__/
+*.pyc
+*.rds
+*.rda
+*.RData
+*.gz
+*.xlsx
+*.pdf
+*.bed
+*.bim
+*.fam
+*.pgen
+*.pvar
+*.psam
+*.log

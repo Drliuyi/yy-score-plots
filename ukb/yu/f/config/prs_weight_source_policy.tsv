@@ -1,0 +1,14 @@
+outcome_id	weight_basis	author_weight_file_public	interpretation
+abdominal_aneurysm	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+atrial_fibrillation	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+aortic_valve_stenosis	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+cad	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+cardiomyopathy	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+deep_vein_thrombosis	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+heart_failure	Endpoint-matched FinnGen R9 GWAS beta; exact author PRS source not reported	FALSE	documented local reconstruction
+intracerebral_hemorrhage	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+ischemic_stroke	Yu supplementary Table S26 GCST006908 GWAS beta	FALSE	article-source reconstruction
+peripheral_arterial_disease	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+pulmonary_embolism	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+thoracic_aneurysm	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
+transient_ischemic_attack	Yu supplementary Table S26 FinnGen R9 GWAS beta	FALSE	article-source reconstruction
