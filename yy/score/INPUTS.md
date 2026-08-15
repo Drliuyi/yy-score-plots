@@ -83,10 +83,12 @@ Yin/Yang scores under `<YY_OUTDIR>/score/yu-strict`.
 ## Common fair inputs
 
 Both fair methods independently rebuild a locked comparison input from
-`<PHEDIR>/Rdata/all.rds` and `<PHEDIR>/Rdata/prot.rds`, plus protected Yin
-and Yang fold manifests under `<YY_SCORE_FOLD_ROOT>`. These participant-level
-files contain EIDs and are intentionally excluded from GitHub. The preparation
-recomputes the CAD endpoint, checks
+`<PHEDIR>/Rdata/all.rds` and `<PHEDIR>/Rdata/prot.rds`. If Yin and Yang fold
+manifests are absent under `<YY_SCORE_FOLD_ROOT>`, the workflow regenerates
+them from those two source files with the frozen event/duration-stratified
+rules and seeds, then verifies their counts and published hashes before
+installation. These participant-level outputs contain EIDs and are
+intentionally excluded from GitHub. The preparation recomputes the CAD endpoint, checks
 every EID and event against the frozen contract, then writes participant
 tables, ordered 2,910-protein float matrices and target RDS files under
 `<YY_OUTDIR>/score/common-fair-inputs`.

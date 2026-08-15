@@ -33,9 +33,11 @@ already completed derived projects under
 frozen Pradeep coefficients or Yu LightGBM booster and does not refit either
 model. The fair methods first
 rebuild their common input from `<PHEDIR>/Rdata/all.rds`,
-`<PHEDIR>/Rdata/prot.rds`, and protected participant-level fold manifests under
-`<YY_OUTDIR>/reference/cad_fivefold_v1`; the fold files are never stored in
-Git. Models fit only within the locked outer-training folds. That preparation
+`<PHEDIR>/Rdata/prot.rds`. When participant-level fold manifests are absent
+under `<YY_OUTDIR>/reference/cad_fivefold_v1`, the workflow deterministically
+regenerates them from those RDS sources and verifies normalized content hashes;
+the fold files are never stored in Git. Models fit only within the locked
+outer-training folds. That preparation
 also writes the participant tables, 2,910-feature
 float matrices and locked Yin/Yang target RDS files under
 `<YY_OUTDIR>/score/common-fair-inputs`; after its `COMPLETE` marker exists,

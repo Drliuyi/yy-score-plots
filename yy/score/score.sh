@@ -109,7 +109,9 @@ Strict-method raw inputs
   Yu raw phenotype:   <PHEDIR>/pheno.tsv.gz
   Yu 3k assay map:    <DIR0>/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv
   Yu source files:    <DIR0>/files/yu-protein-analysis/references/raw
-  Locked fold files:  <YY_SCORE_FOLD_ROOT>/fold_assignment_{yin,yang}.csv
+  Generated fold files: <YY_SCORE_FOLD_ROOT>/fold_assignment_{yin,yang}.csv
+    If absent, fair preflight reconstructs them in memory from all.rds/prot.rds;
+    fair compute installs them only after frozen count, balance and hash checks.
 
 Privacy
   GitHub contains code, configuration and tests only. UKB rows, EIDs, protein
@@ -456,7 +458,7 @@ method_inputs() {
       echo "  GITHUB_METHOD_CODE=${PROJECT_ROOT}"
       echo "  RAW_PHENOTYPE=${PHEDIR}/Rdata/all.rds"
       echo "  RAW_PROTEIN=${PHEDIR}/Rdata/prot.rds"
-      echo "  RESTRICTED_FOLD_ROOT=${FOLD_ROOT}"
+      echo "  GENERATED_OR_VALIDATED_FOLD_ROOT=${FOLD_ROOT}"
       echo "  DERIVED_SOURCE_PROJECT=$(resolve_fair_source 2>/dev/null || echo MISSING)"
       echo "  DERIVED_COMMON_INPUT=${COMMON_ROOT}"
       echo "  YY_PROJECTION_OUTPUT=${YY_OUTDIR}/score/${method}"
@@ -645,6 +647,7 @@ if [[ "$action" == project && "$disease" != cad ]]; then
 fi
 [[ -x "$RSCRIPT" ]] || { echo "Missing Rscript: ${RSCRIPT}" >&2; exit 2; }
 "$RSCRIPT" --vanilla "${PROJECT_ROOT}/tests/test_contracts.R"
+"$RSCRIPT" --vanilla "${PROJECT_ROOT}/tests/test_fold_generation.R"
 
 case "$method" in
   pradeep-strict)

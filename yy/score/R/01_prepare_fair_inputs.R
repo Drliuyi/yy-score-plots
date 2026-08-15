@@ -18,7 +18,7 @@ if (parsed$stage == "help") {
   quit(status = 0L)
 }
 
-required <- c(paths$all_rds, paths$prot_rds, paths$fold_yin, paths$fold_yang, paths$config)
+required <- c(paths$all_rds, paths$prot_rds, paths$config)
 if (parsed$stage == "status") {
   marker <- file.path(paths$common_root, "COMPLETE")
   cat(if (file.exists(marker)) "COMPLETE\n" else "NOT_COMPLETE\n")
@@ -37,20 +37,11 @@ proteins <- setdiff(names(protein_data), "eid")
 if (length(proteins) != cfg$expected$protein_n || anyDuplicated(proteins)) {
   stop("Raw prot.rds protein contract failed: n=", length(proteins), call. = FALSE)
 }
-fold_yin <- data.table::fread(paths$fold_yin, colClasses = list(character = "eid"))
-fold_yang <- data.table::fread(paths$fold_yang, colClasses = list(character = "eid"))
-locked_md5 <- unname(tools::md5sum(c(paths$fold_yin, paths$fold_yang)))
-expected_md5 <- c(
-  as.character(cfg$restricted_reference$yin_md5),
-  as.character(cfg$restricted_reference$yang_md5)
+folds <- score_ensure_fold_manifests(
+  paths, cfg, all_data, protein_data, install = identical(parsed$stage, "prepare")
 )
-if (!identical(locked_md5, expected_md5)) {
-  stop(
-    "Restricted fold manifest identity failed. Expected locked MD5 values ",
-    paste(expected_md5, collapse = ", "), "; found ",
-    paste(locked_md5, collapse = ", "), call. = FALSE
-  )
-}
+fold_yin <- folds$yin
+fold_yang <- folds$yang
 endpoint <- score_build_endpoint(all_data, cfg$follow_end)
 
 all_index_yin <- match(fold_yin$eid, as.character(all_data$eid))
@@ -133,11 +124,12 @@ score_atomic_csv(data.table(feature_index = seq_along(proteins) - 1L, feature = 
 score_write_f32(protein_matrix_yin, file.path(paths$common_root, "protein_yin.f32"))
 score_write_f32(protein_matrix_yang, file.path(paths$common_root, "protein_yang.f32"))
 
+manifest_inputs <- c(required, paths$fold_yin, paths$fold_yang)
 manifest <- data.table(
-  role = c("all_rds", "prot_rds", "fold_yin", "fold_yang", "config"),
-  path = normalizePath(required, winslash = "/", mustWork = TRUE),
-  bytes = as.numeric(file.info(required)$size),
-  md5 = unname(tools::md5sum(required))
+  role = c("all_rds", "prot_rds", "config", "fold_yin", "fold_yang"),
+  path = normalizePath(manifest_inputs, winslash = "/", mustWork = TRUE),
+  bytes = as.numeric(file.info(manifest_inputs)$size),
+  md5 = unname(tools::md5sum(manifest_inputs))
 )
 score_atomic_csv(manifest, file.path(paths$common_root, "input_manifest.csv"))
 score_atomic_text(c(

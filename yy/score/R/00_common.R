@@ -127,6 +127,233 @@ score_build_endpoint <- function(data, follow_end) {
   )
 }
 
+score_stratified_folds <- function(stratum, folds, seed) {
+  stratum <- as.integer(stratum)
+  folds <- as.integer(folds)
+  seed <- as.integer(seed)
+  if (!length(stratum) || anyNA(stratum) || !is.finite(folds) || folds < 2L ||
+      !is.finite(seed)) {
+    stop("Invalid stratified-fold inputs.", call. = FALSE)
+  }
+  set.seed(seed)
+  result <- integer(length(stratum))
+  for (value in unique(stratum)) {
+    index <- which(stratum == value)
+    result[index] <- sample(rep(seq_len(folds), length.out = length(index)))
+  }
+  result
+}
+
+score_fold_generation_settings <- function(config) {
+  generation <- config$fold_generation
+  if (is.null(generation)) stop("fair.json lacks fold_generation settings.", call. = FALSE)
+  breaks <- unlist(generation$yang_duration_breaks, use.names = FALSE)
+  breaks <- vapply(breaks, function(value) {
+    if (identical(as.character(value), "Inf")) Inf else as.numeric(value)
+  }, numeric(1L))
+  if (length(breaks) < 2L || anyNA(breaks) || is.unsorted(breaks, strictly = TRUE)) {
+    stop("Invalid Yang duration breaks in fair.json.", call. = FALSE)
+  }
+  list(
+    ethnicity_column = as.character(generation$ethnicity_column),
+    ethnicity_pattern = as.character(generation$ethnicity_pattern),
+    include_missing_ethnicity = isTRUE(generation$include_missing_ethnicity),
+    yin_seed = as.integer(generation$yin_seed),
+    yang_seed = as.integer(generation$yang_seed),
+    yang_duration_breaks = breaks,
+    outer_folds = as.integer(config$expected$outer_folds)
+  )
+}
+
+score_generate_fold_tables <- function(all_data, protein_data, config) {
+  settings <- score_fold_generation_settings(config)
+  all_data <- data.table::as.data.table(all_data)
+  protein_data <- data.table::as.data.table(protein_data)
+  if (!"eid" %in% names(all_data) || !"eid" %in% names(protein_data)) {
+    stop("all.rds and prot.rds must contain eid before fold generation.", call. = FALSE)
+  }
+  if (!settings$ethnicity_column %in% names(all_data)) {
+    stop("all.rds lacks locked ethnicity column: ", settings$ethnicity_column, call. = FALSE)
+  }
+  all_data[, eid := as.character(eid)]
+  protein_ids <- unique(as.character(protein_data$eid))
+  eligible <- all_data[eid %chin% protein_ids]
+  ethnicity <- as.character(eligible[[settings$ethnicity_column]])
+  keep_ethnicity <- grepl(settings$ethnicity_pattern, ethnicity, ignore.case = TRUE)
+  if (settings$include_missing_ethnicity) keep_ethnicity <- is.na(ethnicity) | keep_ethnicity
+  eligible <- eligible[keep_ethnicity]
+  data.table::setorder(eligible, eid)
+
+  endpoint <- score_build_endpoint(eligible, config$follow_end)
+  yin <- endpoint[prevalent == 0L & is.finite(time) & time > 0,
+                  .(eid, event = as.integer(event))]
+  yang <- endpoint[prevalent == 1L & is.finite(b2e) & b2e < 0,
+                   .(eid, disease_duration_years = abs(as.numeric(b2e)))]
+  data.table::setorder(yin, eid)
+  data.table::setorder(yang, eid)
+  yin[, fold := score_stratified_folds(event, settings$outer_folds, settings$yin_seed)]
+  duration_group <- cut(
+    yang$disease_duration_years,
+    breaks = settings$yang_duration_breaks,
+    include.lowest = TRUE
+  )
+  if (anyNA(duration_group)) stop("Yang duration stratification produced missing groups.", call. = FALSE)
+  yang[, fold := score_stratified_folds(
+    as.integer(duration_group), settings$outer_folds, settings$yang_seed
+  )]
+  list(
+    yin = yin[, .(eid, event, fold)],
+    yang = yang[, .(eid, fold)],
+    settings = settings
+  )
+}
+
+score_validate_fold_tables <- function(folds, config) {
+  yin <- data.table::as.data.table(folds$yin)
+  yang <- data.table::as.data.table(folds$yang)
+  required_yin <- c("eid", "event", "fold")
+  required_yang <- c("eid", "fold")
+  if (length(setdiff(required_yin, names(yin))) ||
+      length(setdiff(required_yang, names(yang)))) {
+    stop("Fold manifest columns are invalid.", call. = FALSE)
+  }
+  expected <- config$expected
+  checks <- c(
+    nrow(yin) == as.integer(expected$yin_n),
+    sum(as.integer(yin$event)) == as.integer(expected$yin_events),
+    nrow(yang) == as.integer(expected$yang_n),
+    !anyDuplicated(as.character(yin$eid)),
+    !anyDuplicated(as.character(yang$eid)),
+    !length(intersect(as.character(yin$eid), as.character(yang$eid))),
+    identical(sort(unique(as.integer(yin$fold))), seq_len(as.integer(expected$outer_folds))),
+    identical(sort(unique(as.integer(yang$fold))), seq_len(as.integer(expected$outer_folds)))
+  )
+  if (!all(checks)) {
+    stop(
+      "Generated fold contract failed: yin=", nrow(yin),
+      " events=", sum(as.integer(yin$event)), " yang=", nrow(yang),
+      ". Check the all.rds/prot.rds versions and CAD endpoint fields.",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+score_expected_fold_md5 <- function(config) {
+  c(
+    yin = as.character(config$restricted_reference$yin_canonical_md5),
+    yang = as.character(config$restricted_reference$yang_canonical_md5)
+  )
+}
+
+score_canonical_fold_md5 <- function(path, side) {
+  columns <- if (identical(side, "yin")) c("eid", "event", "fold") else c("eid", "fold")
+  value <- data.table::fread(path, colClasses = list(character = "eid"))
+  if (length(setdiff(columns, names(value)))) {
+    stop("Fold file lacks canonical columns: ", path, call. = FALSE)
+  }
+  value <- value[, ..columns]
+  data.table::setorder(value, eid)
+  temporary <- tempfile("canonical_fold_", fileext = ".csv")
+  on.exit(unlink(temporary, force = TRUE), add = TRUE)
+  lines <- c(
+    paste(columns, collapse = ","),
+    do.call(paste, c(value, sep = ","))
+  )
+  writeLines(lines, temporary, useBytes = TRUE)
+  unname(tools::md5sum(temporary))
+}
+
+score_write_fold_candidates <- function(folds, directory) {
+  dir.create(directory, recursive = TRUE, showWarnings = FALSE)
+  yin <- tempfile("fold_assignment_yin.", tmpdir = directory, fileext = ".csv")
+  yang <- tempfile("fold_assignment_yang.", tmpdir = directory, fileext = ".csv")
+  data.table::fwrite(folds$yin, yin)
+  data.table::fwrite(folds$yang, yang)
+  list(yin = yin, yang = yang)
+}
+
+score_validate_fold_file_identity <- function(files, config) {
+  observed <- c(
+    score_canonical_fold_md5(files$yin, "yin"),
+    score_canonical_fold_md5(files$yang, "yang")
+  )
+  expected <- unname(score_expected_fold_md5(config))
+  if (!identical(observed, expected)) {
+    stop(
+      "Canonical fold content differs from the frozen CAD reference. Expected ",
+      paste(expected, collapse = ", "), "; generated ", paste(observed, collapse = ", "),
+      ". No fold files were installed. Check source versions and cohort rules.",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+score_ensure_fold_manifests <- function(paths, config, all_data, protein_data, install = FALSE) {
+  existing <- file.exists(c(paths$fold_yin, paths$fold_yang))
+  if (xor(existing[[1L]], existing[[2L]])) {
+    stop(
+      "Partial fold reference detected; refusing regeneration. Present: ",
+      paste(c(paths$fold_yin, paths$fold_yang)[existing], collapse = "; "),
+      call. = FALSE
+    )
+  }
+  if (all(existing)) {
+    files <- list(yin = paths$fold_yin, yang = paths$fold_yang)
+    score_validate_fold_file_identity(files, config)
+    folds <- list(
+      yin = data.table::fread(paths$fold_yin, colClasses = list(character = "eid")),
+      yang = data.table::fread(paths$fold_yang, colClasses = list(character = "eid"))
+    )
+    score_validate_fold_tables(folds, config)
+    cat("FOLD_MANIFESTS_VALIDATED existing\n")
+    return(invisible(folds))
+  }
+
+  folds <- score_generate_fold_tables(all_data, protein_data, config)
+  score_validate_fold_tables(folds, config)
+  temporary_directory <- tempfile("cad_fivefold_generation_")
+  dir.create(temporary_directory, recursive = TRUE, showWarnings = FALSE)
+  on.exit(unlink(temporary_directory, recursive = TRUE, force = TRUE), add = TRUE)
+  temporary <- score_write_fold_candidates(folds, temporary_directory)
+  score_validate_fold_file_identity(temporary, config)
+  if (!isTRUE(install)) {
+    cat("FOLD_MANIFESTS_GENERATABLE exact_frozen_identity\n")
+    return(invisible(folds))
+  }
+
+  dir.create(paths$fold_root, recursive = TRUE, showWarnings = FALSE)
+  if (file.exists(paths$fold_yin) || file.exists(paths$fold_yang)) {
+    stop("Fold files appeared during generation; refusing to overwrite.", call. = FALSE)
+  }
+  if (!file.rename(temporary$yin, paths$fold_yin)) {
+    stop("Cannot install generated Yin fold manifest: ", paths$fold_yin, call. = FALSE)
+  }
+  if (!file.rename(temporary$yang, paths$fold_yang)) {
+    unlink(paths$fold_yin, force = TRUE)
+    stop("Cannot install generated Yang fold manifest: ", paths$fold_yang, call. = FALSE)
+  }
+  manifest <- data.table::data.table(
+    item = c("status", "source_all_rds", "source_prot_rds", "yin_seed", "yang_seed",
+            "yin_file_md5", "yang_file_md5", "yin_canonical_md5",
+            "yang_canonical_md5", "generated_at"),
+    value = c(
+      "GENERATED_FROM_HUANG_RAW_INPUTS",
+      normalizePath(paths$all_rds, winslash = "/", mustWork = TRUE),
+      normalizePath(paths$prot_rds, winslash = "/", mustWork = TRUE),
+      as.character(folds$settings$yin_seed), as.character(folds$settings$yang_seed),
+      unname(tools::md5sum(paths$fold_yin)), unname(tools::md5sum(paths$fold_yang)),
+      score_canonical_fold_md5(paths$fold_yin, "yin"),
+      score_canonical_fold_md5(paths$fold_yang, "yang"),
+      format(Sys.time(), "%Y-%m-%d %H:%M:%S %z")
+    )
+  )
+  score_atomic_csv(manifest, file.path(paths$fold_root, "fold_generation_manifest.csv"))
+  cat("FOLD_MANIFESTS_GENERATED ", paths$fold_root, "\n", sep = "")
+  invisible(folds)
+}
+
 score_known_horizon <- function(time, event, horizon = 5) {
   known <- (event == 1L & time <= horizon) | time > horizon
   list(known = known, label = as.integer(event == 1L & time <= horizon))

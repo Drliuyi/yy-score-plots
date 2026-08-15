@@ -28,10 +28,11 @@ external references rather than bundled data. If Huang's machine lacks them,
 place reviewed copies at the paths above or set the documented environment
 overrides; do not add them to Git.
 
-## Restricted locked fold inputs
+## Deterministically generated fold outputs
 
-The common fair comparison uses participant-level fold manifests. Because they
-contain EIDs, they are stored under the analysis tree rather than the source
+The common fair comparison uses participant-level fold manifests generated
+from `<PHEDIR>/Rdata/all.rds` and `<PHEDIR>/Rdata/prot.rds`. Because they
+contain EIDs, they are written under the analysis tree rather than the source
 tree:
 
 ```text
@@ -39,9 +40,14 @@ tree:
 <YY_OUTDIR>/reference/cad_fivefold_v1/fold_assignment_yang.csv
 ```
 
-Override the directory with `YY_SCORE_FOLD_ROOT`. The code validates counts,
-event labels, fold structure, participant separation, and frozen file identity.
-Only hashes are public:
+Override the directory with `YY_SCORE_FOLD_ROOT`. When both files are absent,
+fair preflight reconstructs them in memory and fair compute writes them using
+the frozen event-stratified rules (`seed=2026` for Yin; duration-stratified
+`seed=2027` for Yang). Existing files are never overwritten. A partial pair is
+an error. The code validates counts, event labels, fold structure, participant
+separation, and frozen canonical content identity. Canonical hashes ignore
+Windows/WSL line-ending differences while remaining sensitive to every EID,
+event and fold assignment. Only hashes are public:
 
 ```text
 Yin SHA-256:  3c325decc66fb6ae9a3a24190ff55b3481bf23e38add6ef9913e589f436f380d

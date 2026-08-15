@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "locked_date": "2026-08-14",
+  "version": "1.0.1",
+  "locked_date": "2026-08-15",
   "seed": 20260814,
   "follow_end": "2024-01-01",
   "horizon_years": 5.0,
@@ -17,8 +17,18 @@
     "yang_file": "fold_assignment_yang.csv",
     "yin_md5": "befca4f9c0c1c2b90afd00e1c30a812e",
     "yang_md5": "14f882efef58ec6754b586c0f4307ce1",
+    "yin_canonical_md5": "d2d6aae96c662bfdf0756ac0611a40a2",
+    "yang_canonical_md5": "e56061bb00588ff936a8525309d1fc34",
     "yin_sha256": "3c325decc66fb6ae9a3a24190ff55b3481bf23e38add6ef9913e589f436f380d",
     "yang_sha256": "bf65dc6d34043c67471dab29d8a866fb6be6ec2a94d5b8b5627f5be0bcb3fdbc"
+  },
+  "fold_generation": {
+    "ethnicity_column": "ethnic.c",
+    "ethnicity_pattern": "White",
+    "include_missing_ethnicity": true,
+    "yin_seed": 2026,
+    "yang_seed": 2027,
+    "yang_duration_breaks": [0, 1, 3, 5, 10, "Inf"]
   },
   "pradeep_fair": {
     "family": "binomial",

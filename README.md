@@ -54,6 +54,7 @@ through the documented overrides. They are deliberately not bundled:
 /mnt/d/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv
 ```
 
-Participant-level five-fold manifests are also external restricted inputs under
-`/mnt/d/analysis/yy/reference/cad_fivefold_v1`; only their validation hashes are
-stored in the repository.
+Participant-level five-fold manifests are generated under
+`/mnt/d/analysis/yy/reference/cad_fivefold_v1` from Huang's `all.rds/prot.rds`
+when absent. They are never uploaded; only their deterministic rules and
+validation hashes are stored in the repository.
