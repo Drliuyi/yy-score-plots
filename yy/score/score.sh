@@ -162,6 +162,35 @@ acquire_compute_lock() {
   }
   local lock_root="${YY_OUTDIR}/score/.locks"
   local lock_file="${lock_root}/${method_name}-${disease_name}.lock"
+  local legacy_marker=""
+  local legacy_output=""
+  case "$method_name" in
+    pradeep-fair)
+      legacy_marker="02_pradeep_fair.R"
+      legacy_output="--output-root=${YY_OUTDIR}/score/pradeep-fair"
+      ;;
+    yu-fair)
+      legacy_marker="03_yu_fair.py"
+      legacy_output="--output-root=${YY_OUTDIR}/score/yu-fair"
+      ;;
+  esac
+  if [[ -n "$legacy_marker" ]]; then
+    local process_path process_pid process_arg process_command
+    for process_path in /proc/[0-9]*; do
+      [[ -r "${process_path}/cmdline" ]] || continue
+      process_pid="${process_path##*/}"
+      [[ "$process_pid" == "$$" ]] && continue
+      process_command=""
+      while IFS= read -r -d '' process_arg; do
+        process_command+="${process_arg} "
+      done <"${process_path}/cmdline" || true
+      if [[ "$process_command" == *"$legacy_marker"* && "$process_command" == *"$legacy_output"* ]]; then
+        echo "A legacy ${method_name} process is already writing to the same output (PID ${process_pid})." >&2
+        echo "Wait for it to finish; the workflow will not launch another fold set." >&2
+        return 3
+      fi
+    done
+  fi
   mkdir -p "$lock_root"
   exec 9>"$lock_file"
   if ! flock -n 9; then
