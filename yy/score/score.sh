@@ -723,9 +723,18 @@ case "$method" in
         --stage=preflight "${prepare_args[@]}"
     fi
     ((confirm == 1)) || { echo "Refusing fit: add --confirm-compute." >&2; exit 2; }
+    output_root="${YY_OUTDIR}/score/${method}"
+    if [[ -f "${output_root}/COMPLETE" ]] &&
+       grep -q 'action=project_existing_scores_without_refit' "${output_root}/COMPLETE"; then
+      echo "Replacing projected ${method} outputs in place with newly computed outputs."
+      for name in \
+        scores_yin_oof.csv.gz scores_yang.csv.gz metrics.csv fold_metrics.csv \
+        roc_curves.csv.gz input_manifest.csv COMPLETE; do
+        [[ -f "${output_root}/${name}" ]] && unlink "${output_root}/${name}"
+      done
+    fi
     "$RSCRIPT" --vanilla "${PROJECT_ROOT}/R/01_prepare_fair_inputs.R" \
       --stage=prepare "${prepare_args[@]}"
-    output_root="${YY_OUTDIR}/score/${method}"
     mkdir -p "${output_root}/logs"
     if [[ "$method" == pradeep-fair ]]; then
       outer_workers="${YY_SCORE_OUTER_WORKERS:-5}"
@@ -743,6 +752,31 @@ case "$method" in
           --output-root="${output_root}" >"${output_root}/logs/fold${fold}.log" 2>&1 &
         active+=("$!"); active_folds+=("$fold")
         if ((${#active[@]} == outer_workers || fold == 5)); then
+          progress_seconds="${YY_SCORE_PROGRESS_SECONDS:-10}"
+          [[ "$progress_seconds" =~ ^[1-9][0-9]*$ ]] || {
+            echo "YY_SCORE_PROGRESS_SECONDS must be a positive integer." >&2
+            exit 2
+          }
+          while :; do
+            running=0
+            status_line="$(date '+%Y-%m-%d %H:%M:%S') |"
+            for index in "${!active[@]}"; do
+              fold_id="${active_folds[$index]}"
+              marker="${output_root}/models/fold$(printf '%02d' "$fold_id")_COMPLETE"
+              if [[ -f "$marker" ]]; then
+                fold_state="COMPLETE"
+              elif kill -0 "${active[$index]}" 2>/dev/null; then
+                fold_state="RUNNING"
+                running=$((running + 1))
+              else
+                fold_state="EXITED"
+              fi
+              status_line+=" fold${fold_id}=${fold_state}"
+            done
+            echo "$status_line"
+            ((running == 0)) && break
+            sleep "$progress_seconds"
+          done
           for index in "${!active[@]}"; do
             if ! wait "${active[$index]}"; then
               echo "Pradeep fair fold ${active_folds[$index]} failed; see ${output_root}/logs/fold${active_folds[$index]}.log" >&2
