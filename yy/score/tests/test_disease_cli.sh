@@ -24,7 +24,7 @@ grep -q 'pradeep-strict yu-strict pradeep-fair yu-fair' <<<"$plot_plan"
 
 pradeep_cad_out="$(bash "$CLI" pradeep-strict --disease cad --inputs)"
 grep -q 'YY_PROJECTION_OUTPUT=/mnt/d/analysis/yy/score/pradeep-strict' <<<"$pradeep_cad_out"
-grep -q 'DERIVED_COMMON_INPUT=/mnt/d/analysis/yy/score/common-fair-inputs/cad' <<<"$pradeep_cad_out"
+grep -q 'DERIVED_COMMON_INPUT=/mnt/d/analysis/yy/score/common-fair-inputs' <<<"$pradeep_cad_out"
 
 yu_cad_out="$(bash "$CLI" yu-strict --disease cad --inputs)"
 grep -q 'YY_PROJECTION_OUTPUT=/mnt/d/analysis/yy/score/yu-strict' <<<"$yu_cad_out"

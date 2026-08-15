@@ -94,9 +94,7 @@ installation. These participant-level outputs contain EIDs and are
 intentionally excluded from GitHub. The preparation recomputes the CAD endpoint, checks
 every EID and event against the frozen contract, then writes participant
 tables, ordered 2,910-protein float matrices and target RDS files under
-`<YY_OUTDIR>/score/common-fair-inputs/cad`. The disease child avoids treating
-an older, unrelated `common-fair-inputs/COMPLETE` marker as completion of this
-four-score CAD workflow.
+`<YY_OUTDIR>/score/common-fair-inputs`.
 
 Pradeep fair and Yu fair then use the same 37,127-person Yin cohort, five
 outer folds, five-year target and 2,910-feature order.  Yang participants are

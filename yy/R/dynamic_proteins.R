@@ -204,51 +204,27 @@ yy_legacy_pradeep_cox_roc <- function(requested, adjustment, dir0, analysis_root
 }
 
 yy_dynamic_paths <- function(dir0, analysis_root, yy_outdir, script_root) {
-  public_common <- yy_first_existing(
-    c(
-      file.path(yy_outdir, "score", "common-fair-inputs", "cad"),
-      file.path(yy_outdir, "score", "common-fair-inputs")
-    ),
-    "Public common Yin-Yang protein cache"
-  )
-  use_public_common <- file.exists(file.path(public_common, "COMPLETE"))
-  if (use_public_common) {
-    cache_root <- public_common
-    figure_input_root <- yy_first_existing(
-      c(public_common,
-        file.path(yy_outdir, "score", "source-projects", "strict-projection-inputs")),
-      "Public locked Yin-Yang target root"
+  public_common <- file.path(yy_outdir, "score", "common-fair-inputs")
+  if (!file.exists(file.path(public_common, "COMPLETE"))) {
+    stop(
+      "Current common Yin-Yang input is incomplete: ", public_common,
+      ". Run `yy score --project` before plotting.",
+      call. = FALSE
     )
-    if (!all(file.exists(file.path(
-      figure_input_root, c("locked_yin_target.rds", "locked_yang_target.rds")
-    )))) {
-      figure_input_root <- yy_first_existing(
-        file.path(yy_outdir, "score", "source-projects", "strict-projection-inputs"),
-        "Public locked Yin-Yang target root"
-      )
-    }
-    if (all(file.exists(file.path(cache_root, c(
-      "participants_yin.csv.gz", "participants_yang.csv.gz"
-    ))))) {
-      participant_suffix <- ".csv.gz"
-    } else if (all(file.exists(file.path(cache_root, c(
-      "participants_yin.csv", "participants_yang.csv"
-    ))))) {
-      participant_suffix <- ".csv"
-    } else {
-      stop("Public common input has no matched Yin/Yang participant pair: ",
-           cache_root, call. = FALSE)
-    }
-  } else {
-    cache_root <- yy_first_existing(
-      file.path(yy_outdir, "score", "source-projects", "common-yinyang-cache"),
-      "Public Yin-Yang derived protein cache"
-    )
-    figure_input_root <- yy_first_existing(
-      file.path(yy_outdir, "score", "source-projects", "strict-projection-inputs"),
-      "Public locked Yin-Yang target root"
-    )
+  }
+  cache_root <- normalizePath(public_common, winslash = "/", mustWork = TRUE)
+  figure_input_root <- cache_root
+  if (all(file.exists(file.path(cache_root, c(
+    "participants_yin.csv.gz", "participants_yang.csv.gz"
+  ))))) {
+    participant_suffix <- ".csv.gz"
+  } else if (all(file.exists(file.path(cache_root, c(
+    "participants_yin.csv", "participants_yang.csv"
+  ))))) {
     participant_suffix <- ".csv"
+  } else {
+    stop("Current common input has no matched Yin/Yang participant pair: ",
+         cache_root, call. = FALSE)
   }
   core_path <- yy_first_existing(
     c(
@@ -260,7 +236,7 @@ yy_dynamic_paths <- function(dir0, analysis_root, yy_outdir, script_root) {
   all_rds_candidates <- file.path(dir0, "data", "ukb", "phe", "Rdata", "all.rds")
   list(
     cache_root = cache_root,
-    cache_source = if (use_public_common) "public_common_contract" else "public_derived_source_project",
+    cache_source = "public_common_contract",
     participants_yin = file.path(cache_root, paste0("participants_yin", participant_suffix)),
     participants_yang = file.path(cache_root, paste0("participants_yang", participant_suffix)),
     features = file.path(cache_root, "protein_features.csv"),

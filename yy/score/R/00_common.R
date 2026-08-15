@@ -47,7 +47,7 @@ score_resolve <- function(project_dir, parsed, method = "") {
   yy_outdir <- parsed$yy_outdir %||% score_env("YY_OUTDIR", file.path(analysis_root, "yy"))
   config <- parsed$config %||% file.path(project_dir, "config", "fair.json")
   common_root <- parsed$common_root %||% score_env(
-    "YY_SCORE_COMMON_ROOT", file.path(yy_outdir, "score", "common-fair-inputs", "cad")
+    "YY_SCORE_COMMON_ROOT", file.path(yy_outdir, "score", "common-fair-inputs")
   )
   fold_root <- parsed$fold_root %||% score_env(
     "YY_SCORE_FOLD_ROOT", file.path(yy_outdir, "reference", "cad_fivefold_v1")
