@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -29,6 +30,23 @@ def arguments() -> argparse.Namespace:
 
 def canonical(value: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(value).lower())
+
+
+def table_separator(path: Path) -> str:
+    """Resolve the delimiter without loading the participant-level table."""
+    lower = str(path).lower()
+    if lower.endswith((".tsv", ".tsv.gz", ".tab", ".tab.gz", ".txt", ".txt.gz")):
+        return "\t"
+    if lower.endswith((".csv", ".csv.gz")):
+        return ","
+    opener = gzip.open if lower.endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8", errors="replace") as handle:
+        header = handle.readline()
+    if "\t" in header:
+        return "\t"
+    if "," in header:
+        return ","
+    raise RuntimeError(f"Cannot determine delimiter for Yu raw protein input: {path}")
 
 
 def participant_file(root: Path, side: str) -> Path:
@@ -129,7 +147,7 @@ def main() -> None:
     if len(np.unique(mapped_feature_index)) != len(mapped_feature_index):
         raise RuntimeError("Yu strict feature mapping is not one-to-one")
 
-    raw_separator = "\t" if str(raw_protein_file).lower().endswith((".tsv", ".tsv.gz", ".txt")) else ","
+    raw_separator = table_separator(raw_protein_file)
     raw_header = pd.read_csv(raw_protein_file, sep=raw_separator, nrows=0).columns.astype(str).tolist()
     eid_candidates = [value for value in ("eid", "id", "f.eid", "participant_id") if value in raw_header]
     if not eid_candidates:
