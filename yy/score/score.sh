@@ -67,9 +67,9 @@ YU_STRICT_PROJECT="cad"
 if [[ -z "${YU_STRICT_RAW_PROTEIN:-}" ]]; then
   YU_STRICT_RAW_PROTEIN="$(first_existing_or_default \
     "${PRADEEP_STRICT_RAW_PROTEIN}" \
+    "${PRADEEP_STRICT_RAW_PROTEIN}" \
     "${PHEDIR}/raw/prot_full_unimputed.tsv" \
     "${PHEDIR}/raw/prot_full_unimputed.tsv.gz" \
-    "${PRADEEP_STRICT_RAW_PROTEIN}" \
     "${PHEDIR}/rap/raw/prot.tab.gz" \
     "${PHEDIR}/raw/prot.tab.gz" \
     "${DIR0}/ppp/prot.tab.gz")"

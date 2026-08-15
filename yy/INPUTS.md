@@ -33,7 +33,7 @@ rebuilding the native Yu cohort and its technical-covariate adjustment. The
 workflow downloads them from the official UKB URL only when absent and locks
 the exact file with SHA-256
 `249d5400603ea57c647ef812ff3ab6cb4ef4990bf0d4aeb39bb5693e573f4380`.
-The existing `prot.tab.gz` and the historical `prot_full_unimputed.tsv` are the
+The preferred `prot.tab.gz` and the historical `prot_full_unimputed.tsv` are the
 same tabular content in compressed and decompressed form, so only the former is
 required.
 

@@ -64,7 +64,7 @@ The underlying UK Biobank assay catalogue is public Resource 1013:
 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=1013. The two local mapping
 tables and BED contain assay/gene metadata rather than participant data.
 
-Yu reuses the existing `prot.tab.gz`; no decompressed
+Yu preferentially reuses the existing `prot.tab.gz`; no decompressed
 `prot_full_unimputed.tsv` duplicate is required. If the Olink processing-date
 table is absent, Yu preflight/compute downloads official UKB Resource 1019 and
 accepts it only after its locked SHA-256 checksum passes:

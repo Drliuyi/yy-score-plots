@@ -11,6 +11,7 @@ SCRIPT_ROOT_TEST="${TEST_ROOT}/scripts"
 mkdir -p \
   "${PHE_ROOT}/Rdata" \
   "${PHE_ROOT}/rap" \
+  "${PHE_ROOT}/raw" \
   "${TEST_ROOT}/ppp/map.raw" \
   "${SCRIPT_ROOT_TEST}/ukb/pradeep" \
   "${SCRIPT_ROOT_TEST}/ukb/yu" \
@@ -24,6 +25,7 @@ touch \
   "${TEST_ROOT}/ppp/map.raw/olink_protein_map_1.5k_v1.tsv" \
   "${TEST_ROOT}/ppp/map.raw/olink_protein_map_3k_v1.tsv" \
   "${TEST_ROOT}/ppp/ppp.b38.bed"
+touch "${PHE_ROOT}/raw/prot_full_unimputed.tsv"
 
 inputs="$({
   DIR0="$TEST_ROOT" \
