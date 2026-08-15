@@ -557,7 +557,10 @@ yy_unified_score_paths <- function(dir0, analysis_root, yy_outdir, script_root) 
     "Public unified Yu benchmark project"
   )
   cache_root <- yy_score_first_existing(
-    file.path(yy_outdir, "score", "common-fair-inputs"),
+    c(
+      file.path(yy_outdir, "score", "common-fair-inputs", "cad"),
+      file.path(yy_outdir, "score", "common-fair-inputs")
+    ),
     "Public common Yin-Yang protein cache"
   )
   python_script <- yy_score_first_existing(

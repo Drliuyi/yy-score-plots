@@ -40,7 +40,7 @@ the fold files are never stored in Git. Models fit only within the locked
 outer-training folds. That preparation
 also writes the participant tables, 2,910-feature
 float matrices and locked Yin/Yang target RDS files under
-`<YY_OUTDIR>/score/common-fair-inputs`; after its `COMPLETE` marker exists,
+`<YY_OUTDIR>/score/common-fair-inputs/cad`; after its `COMPLETE` marker exists,
 `yy plot` can use this public-path rebuild directly.  The two native strict
 AUCs and the two fair five-year IPCW AUCs are
 different estimands and must not be ranked as if they were one matched test.

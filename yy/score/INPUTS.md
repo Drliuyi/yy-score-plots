@@ -61,9 +61,12 @@ The dispatcher delegates to `<SCRIPT_ROOT>/ukb/yu/yu.sh` with the selected
 native `--disease` ID. Its primary raw
 inputs are `<PHEDIR>/raw/prot_full_unimputed.tsv`,
 `<PHEDIR>/Rdata/all.rds`, `<PHEDIR>/pheno.tsv.gz` and the reviewed 3k assay
-map. Source-locked supplementary tables, methods and Olink processing dates
-are passed explicitly from `<DIR0>/files/yu-protein-analysis/references/raw`;
-the dispatcher never accepts a saved legacy path configuration silently.
+map. Olink processing dates are passed explicitly from
+`<DIR0>/files/yu-protein-analysis/references/raw` when rebuilding the native
+cohort. The public supplementary workbook and methods PDF are consulted only
+by the full source-audit stage; they are not numerical inputs to a frozen CAD
+score or to the fair comparison. The dispatcher never accepts a saved legacy
+path configuration silently.
 Steps 1-4 rebuild the input QC, selected incident-disease cohort, full-panel
 Cox screen, local protein selection and native LightGBM held-out evaluation.
 Outputs are isolated under a disease child such as
@@ -91,7 +94,9 @@ installation. These participant-level outputs contain EIDs and are
 intentionally excluded from GitHub. The preparation recomputes the CAD endpoint, checks
 every EID and event against the frozen contract, then writes participant
 tables, ordered 2,910-protein float matrices and target RDS files under
-`<YY_OUTDIR>/score/common-fair-inputs`.
+`<YY_OUTDIR>/score/common-fair-inputs/cad`. The disease child avoids treating
+an older, unrelated `common-fair-inputs/COMPLETE` marker as completion of this
+four-score CAD workflow.
 
 Pradeep fair and Yu fair then use the same 37,127-person Yin cohort, five
 outer folds, five-year target and 2,910-feature order.  Yang participants are

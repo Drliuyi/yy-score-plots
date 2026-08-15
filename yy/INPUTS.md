@@ -14,19 +14,23 @@ required file is unavailable.
 | Baseline phenotype RDS | `<PHEDIR>/Rdata/all.rds` | all methods and plots | restricted; never upload |
 | Standardized protein RDS | `<PHEDIR>/Rdata/prot.rds` | fair methods and protein curves | restricted; never upload |
 | Pradeep raw 1.5k protein table | `<DIR0>/data.BIG/gwas/ppp/prot.tab.gz` | `pradeep-strict` | restricted; never upload |
-| Pradeep 1.5k assay map | `<DIR0>/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv` | `pradeep-strict` | external reference; do not upload |
-| PPP protein BED | `<DIR0>/data.BIG/gwas/ppp/ppp_3k_b38.bed` | Pradeep preflight/figures | external reference; do not upload |
+| Pradeep 1.5k assay map | `<DIR0>/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv` | `pradeep-strict` | non-participant derived metadata; already present on audited WinPC |
+| PPP protein BED | `<DIR0>/data.BIG/gwas/ppp/ppp_3k_b38.bed` | Pradeep preflight/figures | non-participant derived gene coordinates; already present on audited WinPC |
 | Yu unimputed protein table | `<PHEDIR>/raw/prot_full_unimputed.tsv` | `yu-strict` | restricted; never upload |
 | Yu raw phenotype table | `<PHEDIR>/pheno.tsv.gz` | `yu-strict` | restricted; never upload |
-| Yu 3k assay map | `<DIR0>/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv` | `yu-strict` | external reference; do not upload |
-| Yu supplementary workbook | `<DIR0>/files/yu-protein-analysis/references/raw/pwaf072_supplementary_table_1.xlsx` | `yu-strict` source lock | external paper file; do not upload |
-| Yu supplementary methods | `<DIR0>/files/yu-protein-analysis/references/raw/pwaf072_supplementary_figure_1.pdf` | `yu-strict` source lock | external paper file; do not upload |
-| Olink processing dates | `<DIR0>/files/yu-protein-analysis/references/raw/olink_processing_start_date.dat` | `yu-strict` | controlled UKB resource; never upload |
+| Yu 3k assay map | `<DIR0>/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv` | `yu-strict` | non-participant derived metadata; already present on audited WinPC |
+| Yu supplementary workbook | `<DIR0>/files/yu-protein-analysis/references/raw/pwaf072_supplementary_table_1.xlsx` | full Yu source audit only | public article supplement; not a minimal score-model input |
+| Yu supplementary methods | `<DIR0>/files/yu-protein-analysis/references/raw/pwaf072_supplementary_figure_1.pdf` | full Yu source audit only | public article supplement; not a minimal score-model input |
+| Olink processing dates | `<DIR0>/files/yu-protein-analysis/references/raw/olink_processing_start_date.dat` | new `yu-strict` cohort/QC rebuild | generic UKB Resource 1019; no participant IDs |
 
-The 1.5k/3k maps and PPP BED are small, but they are deliberately treated as
-external references rather than bundled data. If Huang's machine lacks them,
-place reviewed copies at the paths above or set the documented environment
-overrides; do not add them to Git.
+The 1.5k/3k maps and PPP BED are not confidential participant files. The maps
+derive from the public UKB Olink assay catalogue (Resource 1013), with reviewed
+gene annotations used for the BED. They remain external only because this is a
+code-only release. The Yu workbook and PDF are public supplements at
+https://pmc.ncbi.nlm.nih.gov/articles/PMC12987571/; they support a full source
+audit but are not mathematical inputs to an already fitted CAD score. Olink
+processing dates are available as UKB Resource 1019 and are needed only when
+rebuilding the native Yu cohort and its technical-covariate adjustment.
 
 ## Deterministically generated fold outputs
 

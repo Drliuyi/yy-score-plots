@@ -45,14 +45,20 @@ comparison. See [yy/README.md](yy/README.md) for plotting examples and
 
 ## External references not included in Git
 
-The following small reference files must be provided at the Huang-lab paths or
-through the documented overrides. They are deliberately not bundled:
+The following small, non-participant metadata files are deliberately not
+bundled in this code-only repository. They are already present on the audited
+WinPC Huang paths; a fresh installation may rebuild them from the UK Biobank
+Olink assay resource and reviewed gene coordinates:
 
 ```text
 /mnt/d/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv
 /mnt/d/data.BIG/gwas/ppp/ppp_3k_b38.bed
 /mnt/d/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv
 ```
+
+The underlying UK Biobank assay catalogue is public Resource 1013:
+https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=1013. The two local mapping
+tables and BED contain assay/gene metadata rather than participant data.
 
 Participant-level five-fold manifests are generated under
 `/mnt/d/analysis/yy/reference/cad_fivefold_v1` from Huang's `all.rds/prot.rds`

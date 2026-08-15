@@ -204,7 +204,13 @@ yy_legacy_pradeep_cox_roc <- function(requested, adjustment, dir0, analysis_root
 }
 
 yy_dynamic_paths <- function(dir0, analysis_root, yy_outdir, script_root) {
-  public_common <- file.path(yy_outdir, "score", "common-fair-inputs")
+  public_common <- yy_first_existing(
+    c(
+      file.path(yy_outdir, "score", "common-fair-inputs", "cad"),
+      file.path(yy_outdir, "score", "common-fair-inputs")
+    ),
+    "Public common Yin-Yang protein cache"
+  )
   use_public_common <- file.exists(file.path(public_common, "COMPLETE"))
   if (use_public_common) {
     cache_root <- public_common
