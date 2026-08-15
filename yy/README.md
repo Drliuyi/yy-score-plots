@@ -28,7 +28,7 @@ Ensure `~/.local/bin` is on `PATH`.
 The complete score-to-figure workflow is intentionally two commands:
 
 ```bash
-yy score --compute --confirm-compute --workers=10 --resume
+yy score --main
 yy plot --main
 ```
 
@@ -58,7 +58,8 @@ yy plot --status
 ```
 
 No formal model fit starts unless both `--compute` and `--confirm-compute` are
-present.
+present, except that the explicit `--main` preset supplies both confirmations
+and resume semantics by design.
 
 ## Custom figures
 

@@ -11,21 +11,167 @@ COMMON_ROOT="${YY_SCORE_COMMON_ROOT:-${YY_OUTDIR}/score/common-fair-inputs}"
 FOLD_ROOT="${YY_SCORE_FOLD_ROOT:-${YY_OUTDIR}/reference/cad_fivefold_v1}"
 SOURCE_PROJECT_ROOT="${YY_SCORE_SOURCE_PROJECT_ROOT:-${YY_OUTDIR}/score/source-projects}"
 RSCRIPT="${RSCRIPT:-/opt/R/4.3.2/bin/Rscript}"
+
+first_existing_or_default() {
+  local fallback="$1"
+  shift
+  local candidate
+  for candidate in "$@"; do
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  printf '%s\n' "$fallback"
+}
+
+file_sha256() {
+  local path="$1"
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$path" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$path" | awk '{print $1}'
+  else
+    echo "No SHA-256 utility found (sha256sum or shasum)." >&2
+    return 2
+  fi
+}
+
 PRADEEP_NATIVE_ROOT="${PRADEEP_NATIVE_ROOT:-${ANALYSIS_ROOT}/pradeep}"
 PRADEEP_STRICT_PROJECT="cad"
-PRADEEP_STRICT_RAW_PROTEIN="${PRADEEP_STRICT_RAW_PROTEIN:-${DIR0}/data.BIG/gwas/ppp/prot.tab.gz}"
-PRADEEP_STRICT_PROTEIN_MAP="${PRADEEP_STRICT_PROTEIN_MAP:-${DIR0}/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv}"
-PRADEEP_STRICT_BED="${PRADEEP_STRICT_BED:-${DIR0}/data.BIG/gwas/ppp/ppp_3k_b38.bed}"
+if [[ -z "${PRADEEP_STRICT_RAW_PROTEIN:-}" ]]; then
+  PRADEEP_STRICT_RAW_PROTEIN="$(first_existing_or_default \
+    "${DIR0}/data.BIG/gwas/ppp/prot.tab.gz" \
+    "${DIR0}/data.BIG/gwas/ppp/prot.tab.gz" \
+    "${PHEDIR}/rap/raw/prot.tab.gz" \
+    "${PHEDIR}/raw/prot.tab.gz" \
+    "${DIR0}/ppp/prot.tab.gz")"
+fi
+if [[ -z "${PRADEEP_STRICT_PROTEIN_MAP:-}" ]]; then
+  PRADEEP_STRICT_PROTEIN_MAP="$(first_existing_or_default \
+    "${DIR0}/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv" \
+    "${DIR0}/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv" \
+    "${DIR0}/ppp/map.raw/olink_protein_map_1.5k_v1.tsv" \
+    "${DIR0}/ppp/olink_protein_map_1.5k_v1.tsv")"
+fi
+if [[ -z "${PRADEEP_STRICT_BED:-}" ]]; then
+  PRADEEP_STRICT_BED="$(first_existing_or_default \
+    "${DIR0}/data.BIG/gwas/ppp/ppp_3k_b38.bed" \
+    "${DIR0}/data.BIG/gwas/ppp/ppp_3k_b38.bed" \
+    "${DIR0}/data.BIG/gwas/ppp/ppp.b38.bed" \
+    "${DIR0}/ppp/ppp_3k_b38.bed" \
+    "${DIR0}/ppp/ppp.b38.bed")"
+fi
 YU_NATIVE_ROOT="${YU_NATIVE_ROOT:-${ANALYSIS_ROOT}/yu}"
 YU_STRICT_PROJECT="cad"
-YU_STRICT_RAW_PROTEIN="${YU_STRICT_RAW_PROTEIN:-${PHEDIR}/raw/prot_full_unimputed.tsv}"
-YU_STRICT_RAW_PHENOTYPE="${YU_STRICT_RAW_PHENOTYPE:-${PHEDIR}/pheno.tsv.gz}"
-YU_STRICT_PANEL_MAP="${YU_STRICT_PANEL_MAP:-${DIR0}/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv}"
+if [[ -z "${YU_STRICT_RAW_PROTEIN:-}" ]]; then
+  YU_STRICT_RAW_PROTEIN="$(first_existing_or_default \
+    "${PRADEEP_STRICT_RAW_PROTEIN}" \
+    "${PHEDIR}/raw/prot_full_unimputed.tsv" \
+    "${PHEDIR}/raw/prot_full_unimputed.tsv.gz" \
+    "${PRADEEP_STRICT_RAW_PROTEIN}" \
+    "${PHEDIR}/rap/raw/prot.tab.gz" \
+    "${PHEDIR}/raw/prot.tab.gz" \
+    "${DIR0}/ppp/prot.tab.gz")"
+fi
+if [[ -z "${YU_STRICT_RAW_PHENOTYPE:-}" ]]; then
+  YU_STRICT_RAW_PHENOTYPE="$(first_existing_or_default \
+    "${PHEDIR}/pheno.tsv.gz" \
+    "${PHEDIR}/pheno.tsv.gz" \
+    "${PHEDIR}/rap/pheno.tsv.gz" \
+    "${PHEDIR}/rap/raw/pheno.tsv.gz" \
+    "${PHEDIR}/common/pheno.tsv.gz")"
+fi
+if [[ -z "${YU_STRICT_PANEL_MAP:-}" ]]; then
+  YU_STRICT_PANEL_MAP="$(first_existing_or_default \
+    "${DIR0}/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv" \
+    "${DIR0}/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv" \
+    "${DIR0}/data.BIG/gwas/ppp/map.raw/olink_protein_map_3k_v1.tsv" \
+    "${DIR0}/ppp/olink_protein_map_3k_v1.tsv" \
+    "${DIR0}/ppp/map.raw/olink_protein_map_3k_v1.tsv")"
+fi
 YU_STRICT_REFERENCE_ROOT="${YU_STRICT_REFERENCE_ROOT:-${DIR0}/files/yu-protein-analysis/references/raw}"
 YU_STRICT_SUPPLEMENT_WORKBOOK="${YU_STRICT_SUPPLEMENT_WORKBOOK:-${YU_STRICT_REFERENCE_ROOT}/pwaf072_supplementary_table_1.xlsx}"
 YU_STRICT_SUPPLEMENT_METHODS="${YU_STRICT_SUPPLEMENT_METHODS:-${YU_STRICT_REFERENCE_ROOT}/pwaf072_supplementary_figure_1.pdf}"
-YU_STRICT_OLINK_DATES="${YU_STRICT_OLINK_DATES:-${YU_STRICT_REFERENCE_ROOT}/olink_processing_start_date.dat}"
+if [[ -z "${YU_STRICT_OLINK_DATES:-}" ]]; then
+  YU_STRICT_OLINK_DATES="$(first_existing_or_default \
+    "${YU_STRICT_REFERENCE_ROOT}/olink_processing_start_date.dat" \
+    "${YU_STRICT_REFERENCE_ROOT}/olink_processing_start_date.dat" \
+    "${SCRIPT_ROOT}/ukb/yu/references/raw/olink_processing_start_date.dat" \
+    "${PHEDIR}/rap/raw/olink_processing_start_date.dat" \
+    "${DIR0}/ppp/olink_processing_start_date.dat")"
+fi
+YU_OLINK_DATES_URL="${YU_OLINK_DATES_URL:-https://biobank.ndph.ox.ac.uk/ukb/ukb/auxdata/olink_processing_start_date.dat}"
+YU_OLINK_DATES_SHA256="${YU_OLINK_DATES_SHA256:-249d5400603ea57c647ef812ff3ab6cb4ef4990bf0d4aeb39bb5693e573f4380}"
 YU_PYTHON="${YU_PYTHON:-}"
+
+ensure_yu_olink_dates() {
+  local target="$YU_STRICT_OLINK_DATES"
+  local observed=""
+  if [[ -f "$target" ]]; then
+    observed="$(file_sha256 "$target")" || return $?
+    if [[ "$observed" != "$YU_OLINK_DATES_SHA256" ]]; then
+      echo "UKB Resource 1019 checksum mismatch: ${target}" >&2
+      echo "Expected: ${YU_OLINK_DATES_SHA256}" >&2
+      echo "Observed: ${observed}" >&2
+      return 2
+    fi
+    echo "UKB Resource 1019: VERIFIED ${target}"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$target")"
+  local temporary
+  temporary="$(mktemp "${target}.download.XXXXXX")"
+  if command -v curl >/dev/null 2>&1; then
+    if ! curl --fail --location --silent --show-error "$YU_OLINK_DATES_URL" --output "$temporary"; then
+      unlink "$temporary"
+      echo "Failed to download UKB Resource 1019 from ${YU_OLINK_DATES_URL}" >&2
+      return 2
+    fi
+  elif command -v wget >/dev/null 2>&1; then
+    if ! wget -qO "$temporary" "$YU_OLINK_DATES_URL"; then
+      unlink "$temporary"
+      echo "Failed to download UKB Resource 1019 from ${YU_OLINK_DATES_URL}" >&2
+      return 2
+    fi
+  else
+    unlink "$temporary"
+    echo "Missing downloader: install curl or wget, then rerun the same command." >&2
+    return 2
+  fi
+  observed="$(file_sha256 "$temporary")" || { unlink "$temporary"; return 2; }
+  if [[ "$observed" != "$YU_OLINK_DATES_SHA256" ]]; then
+    unlink "$temporary"
+    echo "Downloaded UKB Resource 1019 failed checksum validation." >&2
+    echo "Expected: ${YU_OLINK_DATES_SHA256}" >&2
+    echo "Observed: ${observed}" >&2
+    return 2
+  fi
+  mv "$temporary" "$target"
+  echo "UKB Resource 1019: DOWNLOADED_AND_VERIFIED ${target}"
+  echo "Source: ${YU_OLINK_DATES_URL}"
+}
+
+acquire_compute_lock() {
+  local method_name="$1"
+  local disease_name="$2"
+  command -v flock >/dev/null 2>&1 || {
+    echo "Formal computation requires 'flock' to prevent duplicate model runs." >&2
+    return 2
+  }
+  local lock_root="${YY_OUTDIR}/score/.locks"
+  local lock_file="${lock_root}/${method_name}-${disease_name}.lock"
+  mkdir -p "$lock_root"
+  exec 9>"$lock_file"
+  if ! flock -n 9; then
+    echo "A ${method_name} (${disease_name}) computation is already running." >&2
+    echo "Lock: ${lock_file}" >&2
+    return 3
+  fi
+  printf 'pid=%s\nstarted_at=%s\nmethod=%s\ndisease=%s\n' \
+    "$$" "$(date -Iseconds)" "$method_name" "$disease_name" 1>&9
+}
 
 resolve_yu_python() {
   local candidate version
@@ -57,6 +203,8 @@ help_text() {
   cat <<'EOF'
 Usage
   yy score --h
+  yy score --main [--workers=N]
+  yy score --main --status
   yy score --inputs
   yy score --status
   yy score --preflight [--workers=N]
@@ -75,9 +223,9 @@ Methods
   yu-fair          All-2,910 LightGBM on the same common five-year cohort
 
 Main CAD reproduction
-  With no METHOD, yy score operates on all four CAD scores in this order:
+  `yy score --main` computes or resumes all four CAD scores in this order:
   pradeep-strict, yu-strict, pradeep-fair, yu-fair.
-  A successful all-method --compute also projects both strict models onto the
+  A successful main run also projects both strict models onto the
   common Yin/Yang participants, so all four outputs are immediately plot-ready.
 
 Disease selection
@@ -103,12 +251,13 @@ Huang-lab defaults
   YY_SCORE_FOLD_ROOT=/mnt/d/analysis/yy/reference/cad_fivefold_v1
 
 Strict-method raw inputs
-  Pradeep raw protein: <DIR0>/data.BIG/gwas/ppp/prot.tab.gz
+  Pradeep raw protein: auto-detected prot.tab.gz under data.BIG, phe or ppp
   Pradeep 1.5k map:   <DIR0>/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv
-  Yu raw protein:     <PHEDIR>/raw/prot_full_unimputed.tsv
-  Yu raw phenotype:   <PHEDIR>/pheno.tsv.gz
+  Yu raw protein:     reuses the same prot.tab.gz (a decompressed copy is not required)
+  Yu raw phenotype:   auto-detected pheno.tsv.gz under PHEDIR
   Yu 3k assay map:    <DIR0>/data.BIG/gwas/ppp/olink_protein_map_3k_v1.tsv
-  Yu source files:    <DIR0>/files/yu-protein-analysis/references/raw
+  Yu processing date: official UKB Resource 1019, downloaded only if absent
+                      and accepted only with the locked SHA-256 checksum
   Generated fold files: <YY_SCORE_FOLD_ROOT>/fold_assignment_{yin,yang}.csv
     If absent, fair preflight reconstructs them in memory from all.rds/prot.rds;
     fair compute installs them only after frozen count, balance and hash checks.
@@ -159,7 +308,7 @@ CAD fair end-to-end
   when connecting a previously completed common-cohort source project.
 
 Main CAD reproduction in two commands
-  yy score --compute --confirm-compute --workers=10 --resume
+  yy score --main
   yy plot --main
 EOF
 }
@@ -442,6 +591,9 @@ method_inputs() {
       echo "  SOURCE_AUDIT_SUPPLEMENT_WORKBOOK=${YU_STRICT_SUPPLEMENT_WORKBOOK}"
       echo "  SOURCE_AUDIT_SUPPLEMENT_METHODS=${YU_STRICT_SUPPLEMENT_METHODS}"
       echo "  NATIVE_REBUILD_OLINK_DATES=${YU_STRICT_OLINK_DATES}"
+      echo "  NATIVE_REBUILD_OLINK_DATES_STATUS=$([[ -f "$YU_STRICT_OLINK_DATES" ]] && echo AVAILABLE || echo AUTO_DOWNLOAD_ON_PREFLIGHT_OR_COMPUTE)"
+      echo "  NATIVE_REBUILD_OLINK_DATES_URL=${YU_OLINK_DATES_URL}"
+      echo "  NATIVE_REBUILD_OLINK_DATES_SHA256=${YU_OLINK_DATES_SHA256}"
       echo "  R_RUNTIME=${RSCRIPT}"
       echo "  MODEL_PYTHON_RUNTIME=${YU_PYTHON:-AUTO_RESOLVE_PYTHON_3_9}"
       echo "  DERIVED_NATIVE_PROJECT=$(resolve_yu_source 2>/dev/null || echo MISSING)"
@@ -544,12 +696,14 @@ case "$1" in --h|-h|--help|help) help_text; exit 0 ;; esac
 
 if [[ "$1" == --* ]]; then
   main_action=""
-  main_workers="${YY_SCORE_WORKERS:-8}"
+  main_workers="${YY_SCORE_WORKERS:-10}"
   main_confirm=0
   main_resume=0
+  main_preset=0
   main_disease="cad"
   while (($#)); do
     case "$1" in
+      --main) main_preset=1; shift ;;
       --status) main_action=status; shift ;;
       --inputs) main_action=inputs; shift ;;
       --preflight) main_action=preflight; shift ;;
@@ -569,6 +723,11 @@ if [[ "$1" == --* ]]; then
       *) echo "Unknown main CAD yy score option: $1" >&2; exit 2 ;;
     esac
   done
+  if ((main_preset == 1)) && [[ -z "$main_action" ]]; then
+    main_action=compute
+    main_confirm=1
+    main_resume=1
+  fi
   [[ -n "$main_action" ]] || { help_text; exit 0; }
   [[ "$main_workers" =~ ^[1-9][0-9]*$ ]] || { echo "--workers must be a positive integer." >&2; exit 2; }
   case "${main_disease,,}" in
@@ -645,6 +804,9 @@ if [[ "$action" == project && "$disease" != cad ]]; then
   echo "The native ${disease} reproduction remains available through --preflight and --compute." >&2
   exit 2
 fi
+if [[ "$action" == compute ]]; then
+  acquire_compute_lock "$method" "$disease" || exit $?
+fi
 [[ -x "$RSCRIPT" ]] || { echo "Missing Rscript: ${RSCRIPT}" >&2; exit 2; }
 "$RSCRIPT" --vanilla "${PROJECT_ROOT}/tests/test_contracts.R"
 "$RSCRIPT" --vanilla "${PROJECT_ROOT}/tests/test_fold_generation.R"
@@ -694,6 +856,7 @@ case "$method" in
     fi
     command_path="${SCRIPT_ROOT}/ukb/yu/yu.sh"
     [[ -f "$command_path" ]] || { echo "Missing Yu entrypoint: ${command_path}" >&2; exit 2; }
+    ensure_yu_olink_dates || exit $?
     if [[ -z "$YU_PYTHON" ]]; then YU_PYTHON="$(resolve_yu_python)" || exit 2; fi
     strict_args=()
     while IFS= read -r -d '' value; do strict_args+=("$value"); done < <(yu_strict_args)

@@ -25,8 +25,13 @@ def read_json(path):
         return json.load(handle)
 
 
+def table_separator(path):
+    suffix = str(path).lower()
+    return "\t" if suffix.endswith((".tsv", ".txt", ".tab", ".tsv.gz", ".txt.gz", ".tab.gz")) else ","
+
+
 def read_table(path, usecols=None):
-    sep = "\t" if str(path).lower().endswith((".tsv", ".txt", ".tsv.gz")) else ","
+    sep = table_separator(path)
     return pd.read_csv(path, sep=sep, usecols=usecols, low_memory=False)
 
 
@@ -79,7 +84,7 @@ def resolve_custom_panel(raw_protein_file, panel_file="", inline_proteins="", ma
     if not requested:
         raise RuntimeError("Custom protein panel is empty")
 
-    raw_sep = "\t" if str(raw_protein_file).lower().endswith((".tsv", ".txt", ".tsv.gz")) else ","
+    raw_sep = table_separator(raw_protein_file)
     raw_header = list(pd.read_csv(raw_protein_file, sep=raw_sep, nrows=0).columns)
     raw_by_lower = {}
     for feature in raw_header:
@@ -194,7 +199,7 @@ def load_cohorts(analysis_dir):
 
 
 def load_proteins(raw_file, feature_ids, cohort):
-    sample = pd.read_csv(raw_file, sep="\t" if str(raw_file).lower().endswith((".tsv", ".tsv.gz", ".txt")) else ",", nrows=0)
+    sample = pd.read_csv(raw_file, sep=table_separator(raw_file), nrows=0)
     eid_candidates = [x for x in ("eid", "id", "f.eid", "participant_id") if x in sample.columns]
     if not eid_candidates:
         raise RuntimeError("No EID column in raw protein table")
@@ -296,7 +301,7 @@ def select_stage(args, cfg):
         raise RuntimeError(
             f"Published S12 panel contract failed: features={len(published_union)} proteins={official.protein.nunique()}"
         )
-    raw_sep = "\t" if str(args.raw_protein_file).lower().endswith((".tsv", ".txt", ".tsv.gz")) else ","
+    raw_sep = table_separator(args.raw_protein_file)
     raw_header = set(pd.read_csv(args.raw_protein_file, sep=raw_sep, nrows=0).columns)
     missing_published = sorted(set(published_union) - raw_header)
     if missing_published:

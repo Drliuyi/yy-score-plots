@@ -27,10 +27,15 @@ variable.
 
 ```bash
 yy score --inputs
-yy score --preflight --workers=10
-yy score --compute --confirm-compute --workers=10 --resume
+yy score --main
 yy plot --main
 ```
+
+`yy score --main` is the locked, resumable CAD preset: it runs the four score
+methods and produces their plot-ready individual scores. Use
+`yy score --preflight --workers=10` first when only checking a new machine.
+Per-method process locks reject a second concurrent computation instead of
+silently launching duplicate folds into the same output directory.
 
 The score command keeps four methods separate:
 
@@ -46,9 +51,8 @@ comparison. See [yy/README.md](yy/README.md) for plotting examples and
 ## External references not included in Git
 
 The following small, non-participant metadata files are deliberately not
-bundled in this code-only repository. They are already present on the audited
-WinPC Huang paths; a fresh installation may rebuild them from the UK Biobank
-Olink assay resource and reviewed gene coordinates:
+bundled in this code-only repository. The command searches the reviewed
+`data.BIG`, phenotype and `ppp` locations before reporting a missing path:
 
 ```text
 /mnt/d/data.BIG/gwas/ppp/map.raw/olink_protein_map_1.5k_v1.tsv
@@ -59,6 +63,12 @@ Olink assay resource and reviewed gene coordinates:
 The underlying UK Biobank assay catalogue is public Resource 1013:
 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=1013. The two local mapping
 tables and BED contain assay/gene metadata rather than participant data.
+
+Yu reuses the existing `prot.tab.gz`; no decompressed
+`prot_full_unimputed.tsv` duplicate is required. If the Olink processing-date
+table is absent, Yu preflight/compute downloads official UKB Resource 1019 and
+accepts it only after its locked SHA-256 checksum passes:
+https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=1019.
 
 Participant-level five-fold manifests are generated under
 `/mnt/d/analysis/yy/reference/cad_fivefold_v1` from Huang's `all.rds/prot.rds`

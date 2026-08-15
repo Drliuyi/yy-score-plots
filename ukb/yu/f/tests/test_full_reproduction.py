@@ -49,7 +49,7 @@ for token in (
 nodes = {
     node.name: node for node in model_tree.body
     if isinstance(node, ast.FunctionDef) and node.name in {
-        "sha_text", "read_table", "file_sha256", "unique_in_order",
+        "sha_text", "table_separator", "read_table", "file_sha256", "unique_in_order",
         "resolve_custom_panel", "normalize_eid", "load_proteins",
     }
 }
@@ -58,10 +58,10 @@ exec(compile(ast.Module(body=list(nodes.values()), type_ignores=[]), str(MODEL),
 
 with tempfile.TemporaryDirectory() as directory:
     root = Path(directory)
-    raw = root / "protein.tsv"
+    raw = root / "protein.tab.gz"
     panel = root / "panel.csv"
     pd.DataFrame({"eid": ["1", "2"], "gdf15": [1.0, 2.0], "nppb": [2.0, 3.0]}).to_csv(
-        raw, sep="\t", index=False
+        raw, sep="\t", index=False, compression="gzip"
     )
     pd.DataFrame({"feature_id": ["GDF15", "NPPB", "GDF15"]}).to_csv(panel, index=False)
     features, manifest = namespace["resolve_custom_panel"](raw, panel)

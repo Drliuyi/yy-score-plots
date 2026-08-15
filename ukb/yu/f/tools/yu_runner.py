@@ -751,14 +751,16 @@ class Runner:
             self.assert_final_inputs(); self.run_r("figures"); self.run_r("systems_figures"); self.run_r("report"); self.assert_deliverables()
 
     def doctor(self) -> None:
+        prediction_only = os.environ.get("YU_DOCTOR_SCOPE", "").strip().lower() == "prediction"
         required = {
             "R entry": FULL_R, "Python model": MODEL_PY, "protein": Path(self.paths["raw_protein_file"]),
             "phenotype": Path(self.paths["phenotype_rds"]), "raw phenotype": Path(self.paths["raw_phenotype_file"]),
             "panel mapping": Path(self.paths["panel_mapping_file"]),
-            "supplement tables": Path(self.paths["supplement_workbook_file"]),
-            "supplement methods": Path(self.paths["supplement_methods_file"]),
             "Olink dates": Path(self.paths["olink_processing_start_date_file"]),
         }
+        if not prediction_only:
+            required["supplement tables"] = Path(self.paths["supplement_workbook_file"])
+            required["supplement methods"] = Path(self.paths["supplement_methods_file"])
         missing = []
         for label, path in required.items():
             ok = path.is_file() and path.stat().st_size > 0
@@ -766,7 +768,6 @@ class Runner:
             if not ok:
                 missing.append(str(path))
         self.ensure_r(); self.ensure_python()
-        prediction_only = os.environ.get("YU_DOCTOR_SCOPE", "").strip().lower() == "prediction"
         package_specification = (
             "data.table,R.utils,jsonlite,digest,readxl,survival,pROC,ggplot2,bit64"
             if prediction_only else
@@ -780,10 +781,11 @@ class Runner:
         print(f"{package_label:24} {'PASS' if result.returncode == 0 and status == 'PASS' else 'FAIL'}  {status}")
         if result.returncode or status != "PASS":
             missing.append(f"R packages: {status}")
-        if required["supplement tables"].is_file() and sha256(required["supplement tables"]) != EXPECTED_XLSX:
-            missing.append("supplement workbook SHA256")
-        if required["supplement methods"].is_file() and sha256(required["supplement methods"]) != EXPECTED_PDF:
-            missing.append("supplement methods SHA256")
+        if not prediction_only:
+            if required["supplement tables"].is_file() and sha256(required["supplement tables"]) != EXPECTED_XLSX:
+                missing.append("supplement workbook SHA256")
+            if required["supplement methods"].is_file() and sha256(required["supplement methods"]) != EXPECTED_PDF:
+                missing.append("supplement methods SHA256")
         if missing:
             fail("Doctor failed:\n" + "\n".join(missing))
         print("YU PROJECT DOCTOR PASS")

@@ -5,7 +5,7 @@
 Huang-lab reproduction is exposed as two commands:
 
 ```bash
-yy score --compute --confirm-compute --workers=10 --resume
+yy score --main
 yy plot --main
 ```
 
@@ -15,6 +15,17 @@ common Yin/Yang projections. The fair computations already write plot-ready
 individual scores. The second command draws the locked baseline-centred raw
 four-score trajectory and ROC figure. Interrupted work can be resumed with the
 same first command.
+
+Each formal method computation holds an output lock until its final child
+process exits. A second invocation of the same method/disease fails early,
+preventing duplicate folds from writing to one project.
+
+The strict input resolver searches the Huang `data.BIG`, phenotype and `ppp`
+trees. Both strict methods reuse `prot.tab.gz`; Yu does not require a second
+1.1-GB decompressed protein table. Its prediction-only preflight does not
+require the article PDF/workbook. When the processing-date table is missing,
+the command retrieves official UKB Resource 1019 and validates the locked
+SHA-256 before use.
 
 This project exposes four distinct protein-score methods without using a
 `legacy`/`unified` version switch:
