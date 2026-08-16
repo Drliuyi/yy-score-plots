@@ -10,10 +10,11 @@ Usage
   yy plot --h
   yy plot --main
   yy score --h
+  yy score --aa
 
 Commands
   plot    Draw Yin/Yang trajectories and optional ROC panels.
-  score   Inspect or independently compute four Pradeep/Yu score methods.
+  score   Compute four Pradeep/Yu scores and downstream area-AUC analysis.
 EOF
 }
 

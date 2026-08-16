@@ -28,6 +28,7 @@ variable.
 ```bash
 yy score --inputs
 yy score --main
+yy score --aa
 yy plot --main
 ```
 
@@ -43,6 +44,11 @@ The score command keeps four methods separate:
 - `yu-strict`: original Yu LightGBM reproduction;
 - `pradeep-fair`: all-2,910-protein LASSO-logistic on the common cohort;
 - `yu-fair`: all-2,910-protein LightGBM on the same common cohort.
+
+After `yy score --main` completes, `yy score --aa` runs or resumes the locked
+cross-fitted 2,910-protein trajectory area versus AUC5 analysis and creates its
+four-panel figure. Use `yy score --aa --preflight` for a read-only input check
+or `yy score --aa --status` to inspect the five folds and figure files.
 
 Strict and fair ROC curves have different estimands and are not a paired AUC
 comparison. See [yy/README.md](yy/README.md) for plotting examples and

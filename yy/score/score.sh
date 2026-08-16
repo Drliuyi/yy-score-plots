@@ -10,6 +10,7 @@ YY_OUTDIR="${YY_OUTDIR:-${ANALYSIS_ROOT}/yy}"
 COMMON_ROOT="${YY_SCORE_COMMON_ROOT:-${YY_OUTDIR}/score/common-fair-inputs}"
 FOLD_ROOT="${YY_SCORE_FOLD_ROOT:-${YY_OUTDIR}/reference/cad_fivefold_v1}"
 SOURCE_PROJECT_ROOT="${YY_SCORE_SOURCE_PROJECT_ROOT:-${YY_OUTDIR}/score/source-projects}"
+AREA_AUC_OUTPUT_ROOT="${YY_AREA_AUC_OUTPUT_ROOT:-${YY_OUTDIR}/area-auc}"
 RSCRIPT="${RSCRIPT:-/opt/R/4.3.2/bin/Rscript}"
 
 first_existing_or_default() {
@@ -234,6 +235,9 @@ Usage
   yy score --h
   yy score --main [--workers=N]
   yy score --main --status
+  yy score --aa [--workers=N]
+  yy score --aa --preflight
+  yy score --aa --status
   yy score --inputs
   yy score --status
   yy score --preflight [--workers=N]
@@ -256,6 +260,13 @@ Main CAD reproduction
   pradeep-strict, yu-strict, pradeep-fair, yu-fair.
   A successful main run also projects both strict models onto the
   common Yin/Yang participants, so all four outputs are immediately plot-ready.
+
+Post-score area-AUC analysis
+  `yy score --aa` is the locked next step after `yy score --main`. It requires
+  MAIN_CAD_COMPLETE.tsv, resumes the five-fold 2,910-protein analysis, and
+  writes the area/AUC tables plus the four-panel PNG/PDF/SVG.
+  `--aa --preflight` checks inputs without computation; `--aa --status` reports
+  fold and figure completion. Output: <YY_OUTDIR>/area-auc.
 
 Disease selection
   Default: cad
@@ -339,6 +350,10 @@ CAD fair end-to-end
 Main CAD reproduction in two commands
   yy score --main
   yy plot --main
+
+Area-AUC analysis after score completion
+  yy score --aa
+  yy score --aa --status
 EOF
 }
 
@@ -720,6 +735,44 @@ run_main_cad_score() {
   esac
 }
 
+run_area_auc() {
+  local action="$1" workers="$2" resume="$3"
+  local analysis_script="${SCRIPT_ROOT}/yy/R/area_auc_from_score.R"
+  local main_complete="${YY_OUTDIR}/score/MAIN_CAD_COMPLETE.tsv"
+  local args=(
+    --stage="${action}"
+    --workers="${workers}"
+    --output-root="${AREA_AUC_OUTPUT_ROOT}"
+  )
+  [[ "$action" == compute && "$resume" -eq 1 ]] && args+=(--resume)
+
+  printf 'AREA_AUC_STEP %q' "$RSCRIPT"
+  printf ' %q' --vanilla "$analysis_script" "${args[@]}"
+  printf '\n'
+  if [[ "${YY_SCORE_AA_PLAN_ONLY:-0}" == 1 ]]; then return 0; fi
+
+  [[ -f "$analysis_script" ]] || {
+    echo "Missing area-AUC entrypoint: ${analysis_script}" >&2
+    return 2
+  }
+  [[ -x "$RSCRIPT" ]] || {
+    echo "Missing Rscript: ${RSCRIPT}" >&2
+    return 2
+  }
+  if [[ "$action" != status && ! -f "$main_complete" ]]; then
+    echo "Area-AUC requires a completed main CAD score workflow." >&2
+    echo "Missing: ${main_complete}" >&2
+    echo "Run first: yy score --main" >&2
+    return 2
+  fi
+  if [[ "$action" == compute ]]; then
+    acquire_compute_lock area-auc cad || return $?
+  fi
+  DIR0="$DIR0" PHEDIR="$PHEDIR" SCRIPT_ROOT="$SCRIPT_ROOT" \
+    ANALYSIS_ROOT="$ANALYSIS_ROOT" YY_OUTDIR="$YY_OUTDIR" \
+    "$RSCRIPT" --vanilla "$analysis_script" "${args[@]}"
+}
+
 if (($# == 0)); then help_text; exit 0; fi
 case "$1" in --h|-h|--help|help) help_text; exit 0 ;; esac
 
@@ -729,10 +782,12 @@ if [[ "$1" == --* ]]; then
   main_confirm=0
   main_resume=0
   main_preset=0
+  area_auc_preset=0
   main_disease="cad"
   while (($#)); do
     case "$1" in
       --main) main_preset=1; shift ;;
+      --aa) area_auc_preset=1; shift ;;
       --status) main_action=status; shift ;;
       --inputs) main_action=inputs; shift ;;
       --preflight) main_action=preflight; shift ;;
@@ -752,6 +807,40 @@ if [[ "$1" == --* ]]; then
       *) echo "Unknown main CAD yy score option: $1" >&2; exit 2 ;;
     esac
   done
+  ((main_preset + area_auc_preset <= 1)) || {
+    echo "Choose only one of --main or --aa." >&2
+    exit 2
+  }
+  if ((area_auc_preset == 1)); then
+    [[ "$main_disease" == cad || "$main_disease" == coronary_artery_disease ]] || {
+      echo "--aa is currently locked to CAD." >&2
+      exit 2
+    }
+    [[ -n "$main_action" ]] || main_action=compute
+    case "$main_action" in
+      compute|preflight|status) ;;
+      *) echo "--aa supports compute, preflight, or status only." >&2; exit 2 ;;
+    esac
+    [[ "$main_workers" =~ ^[1-9][0-9]*$ ]] || {
+      echo "--workers must be a positive integer." >&2
+      exit 2
+    }
+    [[ "$main_action" != compute || "$main_confirm" -eq 0 ]] || {
+      echo "--confirm-compute is not used by --aa; omit it." >&2
+      exit 2
+    }
+    [[ "$main_action" == compute || "$main_resume" -eq 0 ]] || {
+      echo "--resume applies only to --aa computation." >&2
+      exit 2
+    }
+    [[ "$main_action" != compute ]] || main_resume=1
+    echo "yy command: score"
+    echo "yy score preset: area-auc"
+    echo "yy score action: ${main_action}"
+    echo "yy score output: ${AREA_AUC_OUTPUT_ROOT}"
+    run_area_auc "$main_action" "$main_workers" "$main_resume"
+    exit $?
+  fi
   if ((main_preset == 1)) && [[ -z "$main_action" ]]; then
     main_action=compute
     main_confirm=1

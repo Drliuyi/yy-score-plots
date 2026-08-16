@@ -92,6 +92,19 @@ can be reused without refitting any of the four score models:
   --stage=compute --workers=10 --resume
 ```
 
+The public command wrapping the same R file is:
+
+```bash
+yy score --aa --preflight
+yy score --aa
+yy score --aa --status
+```
+
+`yy score --aa` requires the completion marker created by `yy score --main`,
+uses 10 workers by default, resumes existing fold outputs, and writes to
+`D:/analysis/yy/area-auc`. The direct R commands above remain available for
+development and smoke tests with custom output roots.
+
 For every protein and outer fold, the script derives baseline-centred Yin and
 Yang 0–5-year areas using training-fold normalization and the training-fold
 Cox direction. Five-year IPCW AUC is evaluated only in the corresponding

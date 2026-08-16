@@ -6,6 +6,7 @@ Huang-lab reproduction is exposed as two commands:
 
 ```bash
 yy score --main
+yy score --aa
 yy plot --main
 ```
 
@@ -19,6 +20,10 @@ same first command.
 Each formal method computation holds an output lock until its final child
 process exits. A second invocation of the same method/disease fails early,
 preventing duplicate folds from writing to one project.
+
+`yy score --aa` is the locked post-score CAD step. It requires the main score
+completion marker, resumes the cross-fitted area/AUC5 folds, and generates the
+four-panel trajectory/area figure. It does not refit any Pradeep or Yu score.
 
 The strict input resolver searches the Huang `data.BIG`, phenotype and `ppp`
 trees. Both strict methods reuse `prot.tab.gz`; Yu does not require a second
