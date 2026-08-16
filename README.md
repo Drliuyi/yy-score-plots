@@ -48,6 +48,11 @@ Strict and fair ROC curves have different estimands and are not a paired AUC
 comparison. See [yy/README.md](yy/README.md) for plotting examples and
 [yy/INPUTS.md](yy/INPUTS.md) for the full external-input contract.
 
+The same locked `yy score` common-cohort products can also be passed to
+`yy/R/area_auc_from_score.R` for cross-fitted protein-level Yin/Yang 0–5-year
+trajectory-area versus five-year IPCW-AUC analysis; see
+[yy/README.md](yy/README.md#cross-fitted-trajectory-area-and-auc5).
+
 ## External references not included in Git
 
 The following small, non-participant metadata files are deliberately not

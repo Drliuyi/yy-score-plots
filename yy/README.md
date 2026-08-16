@@ -77,6 +77,29 @@ yy plot --diagnosis --yy --traj --roc \
 Run `yy plot --h` for side, anchor, adjustment, mean/SD, bar, protein, score,
 and ROC options.
 
+## Cross-fitted trajectory area and AUC5
+
+After `yy score --main`, the locked common-cohort matrices and fold assignment
+can be reused without refitting any of the four score models:
+
+```bash
+/opt/R/4.3.2/bin/Rscript --vanilla \
+  /mnt/d/scripts/yy/R/area_auc_from_score.R \
+  --stage=preflight --workers=10
+
+/opt/R/4.3.2/bin/Rscript --vanilla \
+  /mnt/d/scripts/yy/R/area_auc_from_score.R \
+  --stage=compute --workers=10 --resume
+```
+
+For every protein and outer fold, the script derives baseline-centred Yin and
+Yang 0–5-year areas using training-fold normalization and the training-fold
+Cox direction. Five-year IPCW AUC is evaluated only in the corresponding
+outer-test fold. Outputs include protein/fold metrics, five-fold summaries,
+area–AUC Spearman correlations, and the Yang–AUC partial correlation after
+flexible rank adjustment for Yin area. The default output is
+`D:/analysis/yy/area-auc`.
+
 ## Huang-lab path contract
 
 ```text
