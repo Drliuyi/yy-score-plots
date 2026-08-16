@@ -51,7 +51,9 @@ comparison. See [yy/README.md](yy/README.md) for plotting examples and
 The same locked `yy score` common-cohort products can also be passed to
 `yy/R/area_auc_from_score.R` for cross-fitted protein-level Yin/Yang 0–5-year
 trajectory-area versus five-year IPCW-AUC analysis; see
-[yy/README.md](yy/README.md#cross-fitted-trajectory-area-and-auc5).
+[yy/README.md](yy/README.md#cross-fitted-trajectory-area-and-auc5). The same
+file produces the corresponding four-panel PNG/PDF/SVG and its panel-level
+source tables.
 
 ## External references not included in Git
 

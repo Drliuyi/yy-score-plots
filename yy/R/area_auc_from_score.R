@@ -8,6 +8,8 @@
 suppressPackageStartupMessages({
   library(data.table)
   library(survival)
+  library(ggplot2)
+  library(patchwork)
 })
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -40,6 +42,9 @@ if (has_flag("h") || has_flag("help")) {
     "",
     "Default output:",
     "  D:/analysis/yy/area-auc",
+    "",
+    "The compute stage also writes one four-panel figure as PNG, PDF and SVG",
+    "under 05_figures, plus the exact figure source tables under 02_summary.",
     sep = "\n"
   ))
   quit(status = 0L)
@@ -92,13 +97,20 @@ fold_dir <- file.path(output_root, "01_fold_metrics")
 summary_dir <- file.path(output_root, "02_summary")
 qc_dir <- file.path(output_root, "03_qc")
 report_dir <- file.path(output_root, "04_report")
+figure_dir <- file.path(output_root, "05_figures")
+figure_stem <- file.path(figure_dir, "Figure_CAD_YinYang_area_AUC_four_panel_crossfitted")
+expected_figure_files <- paste0(figure_stem, c(".png", ".pdf", ".svg"))
 
 if (stage == "status") {
   fold_files <- file.path(fold_dir, sprintf("fold%02d.csv.gz", 1:5))
-  cat("STATUS=", if (file.exists(complete_file)) "COMPLETE" else "NOT_COMPLETE", "\n", sep = "")
+  status_ok <- file.exists(complete_file) && all(file.exists(expected_figure_files))
+  cat("STATUS=", if (status_ok) "COMPLETE" else "NOT_COMPLETE", "\n", sep = "")
   cat(paste0("fold", 1:5, "=", ifelse(file.exists(fold_files), "COMPLETE", "MISSING")), sep = "\n")
   cat("\n")
-  quit(status = if (file.exists(complete_file)) 0L else 1L)
+  cat(paste0("figure_", c("png", "pdf", "svg"), "=",
+             ifelse(file.exists(expected_figure_files), "COMPLETE", "MISSING")), sep = "\n")
+  cat("\n")
+  quit(status = if (status_ok) 0L else 1L)
 }
 
 missing <- names(paths)[!file.exists(unlist(paths, use.names = FALSE))]
@@ -160,35 +172,50 @@ dir.create(fold_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(summary_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(qc_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(report_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figure_dir, recursive = TRUE, showWarnings = FALSE)
 fold_files <- file.path(fold_dir, sprintf("fold%02d.csv.gz", 1:5))
+reuse_completed_folds <- FALSE
 if (file.exists(complete_file)) {
   complete_lines <- readLines(complete_file, warn = FALSE)
   expected_line <- paste0("proteins=", length(selected))
   if (expected_line %in% complete_lines) {
-    cat("AREA_AUC_COMPLETE preserved\n")
-    quit(status = 0L)
+    if (all(file.exists(expected_figure_files))) {
+      cat("AREA_AUC_COMPLETE preserved\n")
+      quit(status = 0L)
+    }
+    if (all(file.exists(fold_files))) {
+      reuse_completed_folds <- TRUE
+      resume <- TRUE
+      cat("Completed fold metrics found; rebuilding summaries and figures only.\n")
+    } else {
+      stop("COMPLETE exists but fold outputs needed for figure rebuilding are missing: ",
+           output_root, call. = FALSE)
+    }
+  } else {
+    stop("Completed output was created with a different protein count: ",
+         output_root, call. = FALSE)
   }
-  stop("Completed output was created with a different protein count: ",
-       output_root, call. = FALSE)
 }
-if (!resume && any(file.exists(fold_files))) {
+if (!reuse_completed_folds && !resume && any(file.exists(fold_files))) {
   stop("Partial fold outputs exist; rerun with --resume: ", output_root,
        call. = FALSE)
 }
 
 ## Read the locked matrices once. Under WSL/Linux, mclapply workers share these
 ## pages copy-on-write, avoiding ten independent 400-MB input copies.
-cat("Loading locked score matrices...\n")
-if (length(selected) == length(features)) {
-  protein_yin <- read_f32_fortran(paths$protein_yin, nrow(yin), length(features))
-  protein_yang <- read_f32_fortran(paths$protein_yang, nrow(yang), length(features))
-} else {
-  protein_yin <- read_f32_fortran_columns(
-    paths$protein_yin, nrow(yin), length(features), selected
-  )
-  protein_yang <- read_f32_fortran_columns(
-    paths$protein_yang, nrow(yang), length(features), selected
-  )
+if (!reuse_completed_folds) {
+  cat("Loading locked score matrices...\n")
+  if (length(selected) == length(features)) {
+    protein_yin <- read_f32_fortran(paths$protein_yin, nrow(yin), length(features))
+    protein_yang <- read_f32_fortran(paths$protein_yang, nrow(yang), length(features))
+  } else {
+    protein_yin <- read_f32_fortran_columns(
+      paths$protein_yin, nrow(yin), length(features), selected
+    )
+    protein_yang <- read_f32_fortran_columns(
+      paths$protein_yang, nrow(yang), length(features), selected
+    )
+  }
 }
 
 ## The plotted trajectory uses two-year bins centred at 1, 3 and 5 years.
@@ -304,13 +331,27 @@ if (nrow(fold_metrics) != 5L * length(selected) ||
   stop("Merged fold metric contract failed.", call. = FALSE)
 }
 
+rank_spline_residual <- function(value, control) {
+  result <- rep(NA_real_, length(value))
+  ok <- complete.cases(value, control)
+  if (sum(ok) < 6L) return(result)
+  value_rank <- rank(value[ok], ties.method = "average")
+  control_rank <- rank(control[ok], ties.method = "average")
+  result[ok] <- residuals(lm(value_rank ~ splines::ns(control_rank, df = 3)))
+  result
+}
+
 partial_spearman <- function(x, y, control) {
   ok <- complete.cases(x, y, control)
-  rx <- residuals(lm(rank(x[ok], ties.method = "average") ~
-                       splines::ns(rank(control[ok], ties.method = "average"), df = 3)))
-  ry <- residuals(lm(rank(y[ok], ties.method = "average") ~
-                       splines::ns(rank(control[ok], ties.method = "average"), df = 3)))
+  rx <- rank_spline_residual(x[ok], control[ok])
+  ry <- rank_spline_residual(y[ok], control[ok])
   cor(rx, ry, method = "spearman")
+}
+
+spearman_result <- function(x, y) {
+  ok <- complete.cases(x, y)
+  test <- suppressWarnings(cor.test(x[ok], y[ok], method = "spearman", exact = FALSE))
+  list(n = sum(ok), estimate = unname(test$estimate), p_value = test$p.value)
 }
 
 fold_correlations <- fold_metrics[, .(
@@ -336,6 +377,76 @@ protein_summary <- fold_metrics[, .(
   yang_risk_aligned_area_0_5 = mean(yang_risk_aligned_area_0_5)
 ), by = protein]
 
+protein_summary[, continuum_class := fcase(
+  yin_risk_aligned_area_0_5 * yang_risk_aligned_area_0_5 < 0, "Reversal",
+  abs(yin_risk_aligned_area_0_5) > 1.5 * abs(yang_risk_aligned_area_0_5), "Yin-dominant",
+  abs(yang_risk_aligned_area_0_5) > 1.5 * abs(yin_risk_aligned_area_0_5), "Yang-dominant",
+  default = "Continuum"
+)]
+protein_summary[, `:=`(
+  yin_rank = rank(yin_risk_aligned_area_0_5, ties.method = "average"),
+  yang_rank = rank(yang_risk_aligned_area_0_5, ties.method = "average"),
+  auc5_rank = rank(AUC_5y, ties.method = "average")
+)]
+protein_summary[, `:=`(
+  yang_residual_given_yin = rank_spline_residual(
+    yang_risk_aligned_area_0_5, yin_risk_aligned_area_0_5
+  ),
+  auc5_residual_given_yin = rank_spline_residual(AUC_5y, yin_risk_aligned_area_0_5),
+  log2_yin_yang_absolute_ratio = log2(
+    (abs(yin_risk_aligned_area_0_5) + 1e-8) /
+      (abs(yang_risk_aligned_area_0_5) + 1e-8)
+  )
+)]
+
+trajectory_fold <- rbindlist(list(
+  fold_metrics[, .(protein, outer_fold, side = "Yang", years_from_baseline = -5,
+                   mean_risk_aligned = risk_direction * yang_mean_bin5)],
+  fold_metrics[, .(protein, outer_fold, side = "Yang", years_from_baseline = -3,
+                   mean_risk_aligned = risk_direction * yang_mean_bin3)],
+  fold_metrics[, .(protein, outer_fold, side = "Yang", years_from_baseline = -1,
+                   mean_risk_aligned = risk_direction * yang_mean_bin1)],
+  fold_metrics[, .(protein, outer_fold, side = "Yin", years_from_baseline = 1,
+                   mean_risk_aligned = risk_direction * yin_mean_bin1)],
+  fold_metrics[, .(protein, outer_fold, side = "Yin", years_from_baseline = 3,
+                   mean_risk_aligned = risk_direction * yin_mean_bin3)],
+  fold_metrics[, .(protein, outer_fold, side = "Yin", years_from_baseline = 5,
+                   mean_risk_aligned = risk_direction * yin_mean_bin5)]
+))
+trajectory_summary <- trajectory_fold[, .(
+  mean_risk_aligned = mean(mean_risk_aligned),
+  fold_sd = sd(mean_risk_aligned),
+  contributing_folds = sum(is.finite(mean_risk_aligned))
+), by = .(protein, side, years_from_baseline)]
+
+preferred_proteins <- c("NTPROBNP", "MMP12", "GDF15", "HAVCR1", "EDA2R", "PCSK9")
+protein_keys <- protein_key(protein_summary$protein)
+preferred_index <- match(preferred_proteins, protein_keys)
+representative_proteins <- protein_summary$protein[preferred_index[!is.na(preferred_index)]]
+if (length(representative_proteins) < min(6L, nrow(protein_summary))) {
+  fill <- protein_summary[order(-AUC_5y), protein]
+  representative_proteins <- unique(c(representative_proteins, fill))
+}
+representative_proteins <- head(representative_proteins, min(6L, nrow(protein_summary)))
+
+display_name <- function(protein) {
+  labels <- as.character(protein)
+  labels[protein_key(labels) == "NTPROBNP"] <- "NT-proBNP"
+  labels
+}
+trajectory_summary[, display_label := display_name(protein)]
+protein_summary[, display_label := display_name(protein)]
+
+pooled_estimates <- list(
+  spearman_result(protein_summary$yin_risk_aligned_area_0_5, protein_summary$AUC_5y - 0.5),
+  spearman_result(protein_summary$yin_absolute_area_0_5, protein_summary$AUC_5y - 0.5),
+  spearman_result(protein_summary$yin_risk_aligned_area_0_5,
+                  protein_summary$yang_risk_aligned_area_0_5),
+  spearman_result(protein_summary$yang_risk_aligned_area_0_5, protein_summary$AUC_5y - 0.5),
+  spearman_result(protein_summary$yang_residual_given_yin,
+                  protein_summary$auc5_residual_given_yin)
+)
+
 pooled <- data.table(
   comparison = c(
     "Yin risk-aligned area vs AUC5",
@@ -346,25 +457,171 @@ pooled <- data.table(
   ),
   method = c(rep("Spearman on five-fold protein means", 4L),
              "Partial Spearman after spline rank residualization"),
-  estimate = c(
-    cor(protein_summary$yin_risk_aligned_area_0_5, protein_summary$AUC_5y - 0.5,
-        method = "spearman"),
-    cor(protein_summary$yin_absolute_area_0_5, protein_summary$AUC_5y - 0.5,
-        method = "spearman"),
-    cor(protein_summary$yin_risk_aligned_area_0_5,
-        protein_summary$yang_risk_aligned_area_0_5, method = "spearman"),
-    cor(protein_summary$yang_risk_aligned_area_0_5, protein_summary$AUC_5y - 0.5,
-        method = "spearman"),
-    partial_spearman(protein_summary$yang_risk_aligned_area_0_5,
-                     protein_summary$AUC_5y - 0.5,
-                     protein_summary$yin_risk_aligned_area_0_5)
-  )
+  n = vapply(pooled_estimates, `[[`, numeric(1L), "n"),
+  estimate = vapply(pooled_estimates, `[[`, numeric(1L), "estimate"),
+  p_value = vapply(pooled_estimates, `[[`, numeric(1L), "p_value")
 )
 
 atomic_csv(fold_metrics, file.path(summary_dir, "protein_fold_area_auc.csv.gz"))
 atomic_csv(protein_summary, file.path(summary_dir, "protein_area_auc_summary.csv.gz"))
+atomic_csv(trajectory_summary, file.path(summary_dir, "protein_trajectory_bin_summary.csv.gz"))
 atomic_csv(fold_correlations, file.path(summary_dir, "fold_correlations.csv"))
 atomic_csv(pooled, file.path(summary_dir, "correlation_summary.csv"))
+
+class_levels <- c("Continuum", "Yin-dominant", "Yang-dominant", "Reversal")
+class_counts <- merge(
+  data.table(continuum_class = class_levels),
+  protein_summary[, .N, by = continuum_class],
+  by = "continuum_class", all.x = TRUE, sort = FALSE
+)
+class_counts[is.na(N), N := 0L]
+atomic_csv(class_counts, file.path(summary_dir, "continuum_class_counts.csv"))
+
+format_p <- function(p) {
+  if (!is.finite(p)) return("NA")
+  if (p < 2.2e-16) return("<2.2e-16")
+  formatC(p, digits = 3L, format = "g")
+}
+stat_label <- function(row) {
+  sprintf("Spearman rho = %.3f; P %s; n = %d",
+          row$estimate, if (row$p_value < 2.2e-16) format_p(row$p_value)
+          else paste0("= ", format_p(row$p_value)), row$n)
+}
+
+representative_trajectory <- trajectory_summary[protein %in% representative_proteins]
+representative_points <- protein_summary[protein %in% representative_proteins]
+atomic_csv(representative_trajectory,
+           file.path(summary_dir, "figure_panel_a_representative_trajectories.csv"))
+atomic_csv(protein_summary,
+           file.path(summary_dir, "figure_panels_bcd_protein_source.csv.gz"))
+atomic_csv(pooled[c(1L, 3L, 5L)],
+           file.path(summary_dir, "figure_displayed_statistics.csv"))
+
+protein_palette <- c(
+  "NT-proBNP" = "#C95B47", MMP12 = "#B38B00", GDF15 = "#159A62",
+  HAVCR1 = "#1C93A5", EDA2R = "#337AC4", PCSK9 = "#BF3DBB"
+)
+missing_colours <- setdiff(unique(representative_trajectory$display_label), names(protein_palette))
+if (length(missing_colours)) {
+  protein_palette <- c(protein_palette,
+                       setNames(scales::hue_pal()(length(missing_colours)), missing_colours))
+}
+class_palette <- c(
+  Continuum = "#29967F", `Yin-dominant` = "#2D7FC1",
+  `Yang-dominant` = "#F08A34", Reversal = "#8061B4"
+)
+class_labels <- setNames(
+  sprintf("%s (n=%s)", class_counts$continuum_class,
+          format(class_counts$N, big.mark = ",")),
+  class_counts$continuum_class
+)
+common_theme <- theme_classic(base_size = 11, base_family = "sans") +
+  theme(
+    plot.title = element_text(face = "bold", size = 12.5),
+    axis.title = element_text(face = "bold"),
+    axis.line = element_line(linewidth = 0.55),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 8.5)
+  )
+
+panel_a <- ggplot(representative_trajectory,
+                  aes(years_from_baseline, mean_risk_aligned,
+                      colour = display_label, group = display_label)) +
+  annotate("rect", xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf,
+           fill = "#F2EFEC", alpha = 0.70) +
+  annotate("rect", xmin = 0, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "#EAF3FB", alpha = 0.70) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.45) +
+  geom_vline(xintercept = 0, linetype = 3, colour = "grey30", linewidth = 0.55) +
+  geom_line(linewidth = 1.05) +
+  geom_point(shape = 21, fill = "white", stroke = 1.05, size = 3.1) +
+  annotate("text", x = -4.3, y = Inf, label = "Yang", vjust = 1.7,
+           colour = "#645D57", fontface = "bold", size = 4.2) +
+  annotate("text", x = 4.3, y = Inf, label = "Yin", vjust = 1.7,
+           colour = "#2878B8", fontface = "bold", size = 4.2) +
+  scale_colour_manual(values = protein_palette, breaks = unique(representative_trajectory$display_label)) +
+  scale_x_continuous(breaks = c(-5, -3, -1, 0, 1, 3, 5), limits = c(-5.4, 5.4)) +
+  guides(colour = guide_legend(ncol = 3, byrow = TRUE)) +
+  labs(title = "Baseline-centred Yin-Yang trajectories",
+       x = "Years from baseline", y = "Mean risk-aligned protein z-score") +
+  common_theme
+
+highlight_b <- representative_points
+panel_b <- ggplot(protein_summary,
+                  aes(yin_risk_aligned_area_0_5, AUC_5y)) +
+  geom_point(shape = 21, fill = "#4C86A8", colour = "#4C86A8",
+             alpha = 0.28, size = 1.55) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
+              colour = "#BA4438", linewidth = 1.15) +
+  geom_point(data = highlight_b, shape = 21, fill = "white", colour = "black",
+             stroke = 0.9, size = 3) +
+  geom_text(data = highlight_b, aes(label = display_label),
+            hjust = -0.08, vjust = -0.45, size = 3.2, check_overlap = TRUE) +
+  annotate("text", x = -Inf, y = -Inf, hjust = -0.02, vjust = -0.55,
+           label = stat_label(pooled[1L]), size = 3.35) +
+  labs(title = "Yin area and single-protein AUC5",
+       x = "Yin risk-aligned area, 0-5 years", y = "Five-year IPCW AUC") +
+  coord_cartesian(clip = "off") + common_theme +
+  theme(plot.margin = margin(7, 19, 20, 7))
+
+protein_summary[, continuum_class_plot := factor(
+  continuum_class, levels = class_levels
+)]
+panel_c <- ggplot(protein_summary,
+                  aes(yin_risk_aligned_area_0_5, yang_risk_aligned_area_0_5,
+                      colour = continuum_class_plot)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey55", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = 2, colour = "grey55", linewidth = 0.4) +
+  geom_abline(slope = 1.5, intercept = 0, linetype = 3, colour = "grey65") +
+  geom_abline(slope = 1 / 1.5, intercept = 0, linetype = 3, colour = "grey65") +
+  geom_point(alpha = 0.42, size = 1.35) +
+  geom_point(data = representative_points, inherit.aes = FALSE,
+             aes(yin_risk_aligned_area_0_5, yang_risk_aligned_area_0_5),
+             shape = 21, fill = "white", colour = "black", stroke = 0.9, size = 3) +
+  geom_text(data = representative_points, inherit.aes = FALSE,
+            aes(yin_risk_aligned_area_0_5, yang_risk_aligned_area_0_5,
+                label = display_label),
+            hjust = -0.08, vjust = -0.45, size = 3.2, check_overlap = TRUE) +
+  annotate("text", x = -Inf, y = -Inf, hjust = -0.02, vjust = -0.55,
+           label = stat_label(pooled[3L]), size = 3.35) +
+  scale_colour_manual(values = class_palette, labels = class_labels, drop = FALSE) +
+  guides(colour = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(title = "Four Yin-Yang area phenotypes",
+       x = "Yin risk-aligned area, 0-5 years",
+       y = "Yang risk-aligned area, 0-5 years") +
+  coord_cartesian(clip = "off") + common_theme +
+  theme(plot.margin = margin(7, 19, 20, 7))
+
+panel_d <- ggplot(protein_summary,
+                  aes(yang_residual_given_yin, auc5_residual_given_yin)) +
+  geom_hline(yintercept = 0, colour = "grey65", linewidth = 0.45) +
+  geom_vline(xintercept = 0, colour = "grey65", linewidth = 0.45) +
+  geom_point(shape = 21, fill = "grey55", colour = "grey45",
+             alpha = 0.30, size = 1.45) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE,
+              colour = "#BA4438", linewidth = 1.15) +
+  annotate("text", x = -Inf, y = -Inf, hjust = -0.02, vjust = -0.55,
+           label = stat_label(pooled[5L]), size = 3.35) +
+  labs(title = "Residual Yang area and residual AUC5",
+       x = "Yang-area rank residual", y = "AUC5-rank residual") +
+  coord_cartesian(clip = "off") + common_theme +
+  theme(legend.position = "none", plot.margin = margin(7, 7, 20, 7))
+
+four_panel <- (panel_a | panel_b) / (panel_c | panel_d) +
+  plot_annotation(tag_levels = "a") &
+  theme(plot.tag = element_text(face = "bold", size = 16))
+figure_stem <- file.path(figure_dir, "Figure_CAD_YinYang_area_AUC_four_panel_crossfitted")
+ggsave(paste0(figure_stem, ".png"), four_panel, width = 15.8, height = 11.8,
+       dpi = 300, device = ragg::agg_png, bg = "white")
+ggsave(paste0(figure_stem, ".pdf"), four_panel, width = 15.8, height = 11.8,
+       device = cairo_pdf, bg = "white")
+ggsave(paste0(figure_stem, ".svg"), four_panel, width = 15.8, height = 11.8,
+       device = svglite::svglite, bg = "white")
+figure_files <- paste0(figure_stem, c(".png", ".pdf", ".svg"))
+if (any(!file.exists(figure_files)) || any(file.info(figure_files)$size <= 1000)) {
+  stop("Four-panel figure output contract failed.", call. = FALSE)
+}
 
 manifest <- data.table(
   role = names(paths), path = normalizePath(unlist(paths), winslash = "/", mustWork = TRUE),
@@ -374,11 +631,16 @@ manifest <- data.table(
 atomic_csv(manifest, file.path(qc_dir, "input_manifest.csv"))
 qc <- data.table(
   check = c("yin_n", "yin_events", "yang_n", "protein_n", "fold_rows",
-            "finite_primary_metrics", "five_folds"),
+            "finite_primary_metrics", "five_folds", "trajectory_rows",
+            "figure_png", "figure_pdf", "figure_svg"),
   observed = c(nrow(yin), sum(yin$event), nrow(yang), nrow(protein_summary),
                nrow(fold_metrics),
-               as.integer(all(is.finite(pooled$estimate))), uniqueN(fold_metrics$outer_fold)),
-  expected = c(37127, 3442, 1766, length(selected), 5L * length(selected), 1, 5)
+               as.integer(all(is.finite(pooled$estimate))), uniqueN(fold_metrics$outer_fold),
+               nrow(trajectory_summary), as.integer(file.exists(figure_files[[1L]])),
+               as.integer(file.exists(figure_files[[2L]])),
+               as.integer(file.exists(figure_files[[3L]]))),
+  expected = c(37127, 3442, 1766, length(selected), 5L * length(selected), 1, 5,
+               6L * length(selected), 1, 1, 1)
 )
 qc[, status := fifelse(observed == expected, "PASS", "FAIL")]
 atomic_csv(qc, file.path(qc_dir, "qc.csv"))
@@ -394,6 +656,7 @@ report <- c(
   "- AUC5 is evaluated only in the corresponding outer-test fold using IPCW.",
   "- Risk alignment uses only the sign of the training-fold Cox coefficient.",
   "- Yang partial correlation is evaluated after flexible rank control for Yin area.",
+  "- The four-panel figure is generated from these same cross-fitted summaries.",
   "",
   "## Correlations",
   "",
@@ -401,7 +664,14 @@ report <- c(
   "",
   "## Interpretation boundary",
   "",
-  "These are cross-sectional case-timing pseudo-trajectories from baseline measurements, not within-person longitudinal trajectories. Correlation does not show that area weighting improves a multivariable prediction model."
+  "These are cross-sectional case-timing pseudo-trajectories from baseline measurements, not within-person longitudinal trajectories. Correlation does not show that area weighting improves a multivariable prediction model.",
+  "",
+  "## Figure outputs",
+  "",
+  "- 05_figures/Figure_CAD_YinYang_area_AUC_four_panel_crossfitted.png",
+  "- 05_figures/Figure_CAD_YinYang_area_AUC_four_panel_crossfitted.pdf",
+  "- 05_figures/Figure_CAD_YinYang_area_AUC_four_panel_crossfitted.svg",
+  "- Exact panel source tables are stored under 02_summary."
 )
 writeLines(report, file.path(report_dir, "RESULTS_SUMMARY.md"), useBytes = TRUE)
 writeLines(c(

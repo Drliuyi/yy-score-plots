@@ -100,6 +100,21 @@ area–AUC Spearman correlations, and the Yang–AUC partial correlation after
 flexible rank adjustment for Yin area. The default output is
 `D:/analysis/yy/area-auc`.
 
+The same R file also renders the webpage-style four-panel figure from those
+new cross-fitted summaries:
+
+1. representative baseline-centred Yin/Yang protein trajectories;
+2. Yin 0–5-year risk-aligned area versus five-year single-protein IPCW AUC;
+3. Yin area versus Yang area with continuum, Yin-dominant, Yang-dominant and
+   reversal phenotypes;
+4. Yang-area rank residual versus AUC5-rank residual after spline adjustment
+   for Yin area.
+
+The PNG, PDF and SVG are written to `05_figures`; the exact source tables for
+all four panels are written to `02_summary`. If an older completed run already
+contains the five fold tables but not the figure, rerunning the same compute
+command rebuilds only the summaries and figures without refitting proteins.
+
 ## Huang-lab path contract
 
 ```text
